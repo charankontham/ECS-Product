@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -40,8 +41,8 @@ public class ProductController {
     }
 
     @PutMapping()
-    public ResponseEntity<?> updateProduct(@RequestBody ProductFinalDto productFinalDto) {
-        Object response = productService.updateProduct(productFinalDto);
+    public ResponseEntity<?> updateProducts(@RequestBody List<ProductFinalDto> productFinalDtoList) {
+        Object response = productService.updateProducts(productFinalDtoList);
         return HelperFunctions.getResponseEntity(response);
     }
 

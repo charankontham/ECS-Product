@@ -12,7 +12,9 @@ public interface IProductService {
 
     Object addProduct(ProductDto productDto);
 
-    Object updateProduct(ProductFinalDto productFinalDto);
+//    Object updateProducts(ProductFinalDto productFinalDto);
+
+    Object updateProducts(List<ProductFinalDto> productFinalDtoList);
 
     boolean deleteProduct(Integer productId);
 

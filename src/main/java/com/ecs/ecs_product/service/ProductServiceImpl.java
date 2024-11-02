@@ -8,11 +8,14 @@ import com.ecs.ecs_product.mapper.ProductMapper;
 import com.ecs.ecs_product.repository.ProductRepository;
 import com.ecs.ecs_product.service.interfaces.*;
 import com.ecs.ecs_product.util.Constants;
-import com.ecs.ecs_product.validations.ProductValidation;
+import com.ecs.ecs_product.util.HelperFunctions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,18 +51,34 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public Object addProduct(ProductDto productDto) {
-        boolean productExists = productRepository.existsById(productDto.getProductId());
-        if(productExists) {
-            return HttpStatus.CONFLICT;
+
+        boolean productIdExists = Objects.nonNull(productDto.getProductId());
+        if(productIdExists) {
+            if(productRepository.existsById(productDto.getProductId())){
+                return HttpStatus.CONFLICT;
+            }
         }
-        return validateAndSaveOrUpdateProduct(productDto);
+        return validateAndSaveOrUpdateProduct(List.of(productDto));
     }
 
+//    @Override
+//    public Object updateProducts(ProductFinalDto productFinalDto) {
+//        boolean productExists = productRepository.existsById(productFinalDto.getProductId());
+//        if(productExists) {
+//            return validateAndSaveOrUpdateProduct(ProductMapper.mapToProductDto(productFinalDto));
+//        }
+//        return Constants.ProductNotFound;
+//    }
+
     @Override
-    public Object updateProduct(ProductFinalDto productFinalDto) {
-        boolean productExists = productRepository.existsById(productFinalDto.getProductId());
-        if(productExists) {
-            return validateAndSaveOrUpdateProduct(ProductMapper.mapToProductDto(productFinalDto));
+    public Object updateProducts(List<ProductFinalDto> productFinalDtoList) {
+        List<ProductFinalDto> productExistsList = productFinalDtoList.stream().filter(
+                productFinalDto -> productRepository.existsById(productFinalDto.getProductId())
+        ).toList();
+        if(productExistsList.size() == productFinalDtoList.size()) {
+            List<ProductDto> productDtoList = productFinalDtoList.
+                    stream().map(ProductMapper::mapToProductDto).toList();
+            return validateAndSaveOrUpdateProduct(productDtoList);
         }
         return Constants.ProductNotFound;
     }
@@ -79,21 +98,17 @@ public class ProductServiceImpl implements IProductService {
         return productRepository.existsById(productId);
     }
 
-    private Object validateAndSaveOrUpdateProduct(ProductDto productDto) {
-        if(!ProductValidation.isProductDtoSchemaValid(productDto)){
+    private Object validateAndSaveOrUpdateProduct(List<ProductDto> productDtoList) {
+        if(!HelperFunctions.getProductValidationStatus(productDtoList)){
             return HttpStatus.BAD_REQUEST;
-        }
-        boolean productCategoryExists = productCategoryService.
-                isProductCategoryExists(productDto.getProductCategoryId());
-        boolean productBrandExists = productBrandService.isProductBrandExists(productDto.getProductBrandId());
-        if(!productBrandExists){
+        } else if(!HelperFunctions.getProductBrandExistsStatus(productDtoList, productBrandService)){
             return Constants.ProductBrandNotFound;
-        } else if (!productCategoryExists) {
+        } else if (!HelperFunctions.getProductCategoryExistsStatus(productDtoList, productCategoryService)) {
             return Constants.ProductCategoryNotFound;
         } else {
-            Product product = productRepository.
-                    save(ProductMapper.mapToProduct(productDto));
-            return ProductMapper.mapToProductFinalDto(product, productCategoryService, productBrandService);
+            List<Product> products = productRepository.
+                    saveAll(productDtoList.stream().map(ProductMapper::mapToProduct).collect(Collectors.toList()));
+            return products.stream().map((product) -> ProductMapper.mapToProductFinalDto(product, productCategoryService, productBrandService) ).toList();
         }
     }
 }
