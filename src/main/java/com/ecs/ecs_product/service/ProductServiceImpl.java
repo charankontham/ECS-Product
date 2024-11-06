@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -28,7 +27,7 @@ public class ProductServiceImpl implements IProductService {
     @Autowired
     private IProductBrandService productBrandService;
     @Autowired
-    private RemoveDependencies removeDependencies;
+    private CheckDependencies checkDependencies;
 
     @Override
     public ProductFinalDto getProduct(Integer productId) {
@@ -41,10 +40,10 @@ public class ProductServiceImpl implements IProductService {
     public List<ProductFinalDto> getAllProducts() {
         List<Product> products = productRepository.findAll();
         return products.stream().map((product) -> ProductMapper.
-                mapToProductFinalDto(
-                        product,
-                        productCategoryService,
-                        productBrandService)
+                        mapToProductFinalDto(
+                                product,
+                                productCategoryService,
+                                productBrandService)
                 ).
                 collect(Collectors.toList());
     }
@@ -53,29 +52,20 @@ public class ProductServiceImpl implements IProductService {
     public Object addProduct(ProductDto productDto) {
 
         boolean productIdExists = Objects.nonNull(productDto.getProductId());
-        if(productIdExists) {
-            if(productRepository.existsById(productDto.getProductId())){
+        if (productIdExists) {
+            if (productRepository.existsById(productDto.getProductId())) {
                 return HttpStatus.CONFLICT;
             }
         }
         return validateAndSaveOrUpdateProduct(List.of(productDto));
     }
 
-//    @Override
-//    public Object updateProducts(ProductFinalDto productFinalDto) {
-//        boolean productExists = productRepository.existsById(productFinalDto.getProductId());
-//        if(productExists) {
-//            return validateAndSaveOrUpdateProduct(ProductMapper.mapToProductDto(productFinalDto));
-//        }
-//        return Constants.ProductNotFound;
-//    }
-
     @Override
     public Object updateProducts(List<ProductFinalDto> productFinalDtoList) {
         List<ProductFinalDto> productExistsList = productFinalDtoList.stream().filter(
                 productFinalDto -> productRepository.existsById(productFinalDto.getProductId())
         ).toList();
-        if(productExistsList.size() == productFinalDtoList.size()) {
+        if (productExistsList.size() == productFinalDtoList.size()) {
             List<ProductDto> productDtoList = productFinalDtoList.
                     stream().map(ProductMapper::mapToProductDto).toList();
             return validateAndSaveOrUpdateProduct(productDtoList);
@@ -84,13 +74,15 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public boolean deleteProduct(Integer productId) {
-        if(productId!=0 && productRepository.existsById(productId)){
-            removeDependencies.deleteProductDependencies(productId);
-            productRepository.deleteById(productId);
-            return true;
+    public HttpStatus deleteProduct(Integer productId) {
+        if (productId != 0 && productRepository.existsById(productId)) {
+            if (!checkDependencies.productDependenciesExists(productId)) {
+                productRepository.deleteById(productId);
+                return HttpStatus.OK;
+            }
+            return HttpStatus.CONFLICT;
         }
-        return false;
+        return HttpStatus.NOT_FOUND;
     }
 
     @Override
@@ -99,16 +91,16 @@ public class ProductServiceImpl implements IProductService {
     }
 
     private Object validateAndSaveOrUpdateProduct(List<ProductDto> productDtoList) {
-        if(!HelperFunctions.getProductValidationStatus(productDtoList)){
+        if (!HelperFunctions.getProductValidationStatus(productDtoList)) {
             return HttpStatus.BAD_REQUEST;
-        } else if(!HelperFunctions.getProductBrandExistsStatus(productDtoList, productBrandService)){
+        } else if (!HelperFunctions.getProductBrandExistsStatus(productDtoList, productBrandService)) {
             return Constants.ProductBrandNotFound;
         } else if (!HelperFunctions.getProductCategoryExistsStatus(productDtoList, productCategoryService)) {
             return Constants.ProductCategoryNotFound;
         } else {
             List<Product> products = productRepository.
                     saveAll(productDtoList.stream().map(ProductMapper::mapToProduct).collect(Collectors.toList()));
-            return products.stream().map((product) -> ProductMapper.mapToProductFinalDto(product, productCategoryService, productBrandService) ).toList();
+            return products.stream().map((product) -> ProductMapper.mapToProductFinalDto(product, productCategoryService, productBrandService)).toList();
         }
     }
 }

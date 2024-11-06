@@ -58,39 +58,39 @@ public class HelperFunctions {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    public static void removeCartItemsByProductId(Integer productId, OrderService orderService) {
-        List<CartDto> carts = orderService.getCartsByProductId(productId).getBody();
-        for (CartDto cartDto : Objects.requireNonNull(carts)) {
-            List<Integer> productIds = cartDto.getProductIds();
-            List<Integer> productQuantities = cartDto.getProductQuantities();
-            if (productIds.size() == 1) {
-                orderService.deleteCart(cartDto.getCartId());
-            } else {
-                productQuantities.remove(productIds.indexOf(productId));
-                productIds.remove(productId);
-                cartDto.setProductIds(productIds);
-                cartDto.setProductQuantities(productQuantities);
-                orderService.updateCart(cartDto);
-            }
-        }
-    }
+//    public static void removeCartItemsByProductId(Integer productId, OrderService orderService) {
+//        List<CartDto> carts = orderService.getCartsByProductId(productId).getBody();
+//        for (CartDto cartDto : Objects.requireNonNull(carts)) {
+//            List<Integer> productIds = cartDto.getProductIds();
+//            List<Integer> productQuantities = cartDto.getProductQuantities();
+//            if (productIds.size() == 1) {
+//                orderService.deleteCart(cartDto.getCartId());
+//            } else {
+//                productQuantities.remove(productIds.indexOf(productId));
+//                productIds.remove(productId);
+//                cartDto.setProductIds(productIds);
+//                cartDto.setProductQuantities(productQuantities);
+//                orderService.updateCart(cartDto);
+//            }
+//        }
+//    }
 
-    public static void removeOrderItemsByProductId(Integer productId, OrderService orderService) {
-        List<OrderDto> orders = orderService.getAllOrdersByProductId(productId).getBody();
-        for (OrderDto orderDto : Objects.requireNonNull(orders)) {
-            List<Integer> productIds = orderDto.getProductIds();
-            List<Integer> productQuantities = orderDto.getProductQuantities();
-            if (productIds.size() == 1) {
-                orderService.deleteOrder(orderDto.getOrderId());
-            } else {
-                productQuantities.remove(productIds.indexOf(productId));
-                productIds.remove(productId);
-                orderDto.setProductIds(productIds);
-                orderDto.setProductQuantities(productQuantities);
-                orderService.updateOrder(orderDto);
-            }
-        }
-    }
+//    public static void removeOrderItemsByProductId(Integer productId, OrderService orderService) {
+//        List<OrderDto> orders = orderService.getAllOrdersByProductId(productId).getBody();
+//        for (OrderDto orderDto : Objects.requireNonNull(orders)) {
+//            List<Integer> productIds = orderDto.getProductIds();
+//            List<Integer> productQuantities = orderDto.getProductQuantities();
+//            if (productIds.size() == 1) {
+//                orderService.deleteOrder(orderDto.getOrderId());
+//            } else {
+//                productQuantities.remove(productIds.indexOf(productId));
+//                productIds.remove(productId);
+//                orderDto.setProductIds(productIds);
+//                orderDto.setProductQuantities(productQuantities);
+//                orderService.updateOrder(orderDto);
+//            }
+//        }
+//    }
 
     public static boolean getProductValidationStatus(List<ProductDto> productDtoList) {
         List<ProductDto> filteredProductDtoList = productDtoList.stream().filter(

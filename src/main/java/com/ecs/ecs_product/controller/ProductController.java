@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -20,7 +19,7 @@ public class ProductController {
     private IProductService productService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductFinalDto> getProductById(@PathVariable("id") int productId) {
+    public ResponseEntity<ProductFinalDto> getProductById(@PathVariable("id") Integer productId) {
         ProductFinalDto productFinalDto = productService.getProduct(productId);
         return ResponseEntity.ok(productFinalDto);
     }
@@ -40,18 +39,20 @@ public class ProductController {
         return HelperFunctions.getResponseEntity(response);
     }
 
-    @PutMapping()
+    @PutMapping
     public ResponseEntity<?> updateProducts(@RequestBody List<ProductFinalDto> productFinalDtoList) {
         Object response = productService.updateProducts(productFinalDtoList);
         return HelperFunctions.getResponseEntity(response);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteProduct(@PathVariable("id") int productId) {
-        boolean isDeleted = productService.deleteProduct(productId);
-        if(isDeleted) {
+    public ResponseEntity<String> deleteProduct(@PathVariable("id") Integer productId) {
+        HttpStatus status = productService.deleteProduct(productId);
+        if(status.equals(HttpStatus.OK)) {
             return ResponseEntity.status(HttpStatus.OK).body("Product deleted successfully!");
+        }else if(status.equals(HttpStatus.NOT_FOUND)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found!");
         }
-        return HelperFunctions.getResponseEntity(Constants.ProductNotFound);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body("Product cannot be deleted!");
     }
 }
