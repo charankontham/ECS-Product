@@ -1,15 +1,17 @@
 package com.ecs.ecs_product.feign;
 
+import com.ecs.ecs_product.dto.ProductReviewDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient("PRODUCT-REVIEW-SERVICE")
-public interface ProductReviewService {
-    @DeleteMapping("/deleteByCustomerId/{customerId}")
-    ResponseEntity<String> deleteProductReviewByCustomerId(@PathVariable("customerId") int customerId);
+import java.util.List;
 
-    @DeleteMapping("/deleteByProductId/{productId}")
-    ResponseEntity<String> deleteProductReviewByProductId(@PathVariable("productId") int productId);
+@FeignClient(name="ECS-REVIEWS", configuration = FeignClientConfig.class)
+public interface ProductReviewService {
+
+    @GetMapping("/api/productReview/getReviewsByProductId/{id}")
+    ResponseEntity<List<ProductReviewDto>> getProductReviewsByProductId(@PathVariable("id") Integer productId);
 }

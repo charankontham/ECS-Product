@@ -2,6 +2,8 @@ package com.ecs.ecs_product.service.interfaces;
 
 import com.ecs.ecs_product.dto.ProductDto;
 import com.ecs.ecs_product.dto.ProductFinalDto;
+import org.springframework.http.HttpStatus;
+
 import java.util.List;
 
 public interface IProductService {
@@ -12,9 +14,11 @@ public interface IProductService {
 
     Object addProduct(ProductDto productDto);
 
-    Object updateProduct(ProductFinalDto productFinalDto);
+//    Object updateProducts(ProductFinalDto productFinalDto);
 
-    boolean deleteProduct(Integer productId);
+    Object updateProducts(List<ProductFinalDto> productFinalDtoList);
+
+    HttpStatus deleteProduct(Integer productId);
 
     boolean isProductExists(Integer productId);
 }
