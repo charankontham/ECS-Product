@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImpl implements IProductService {
-
     @Autowired
     private ProductRepository productRepository;
     @Autowired
@@ -32,7 +31,7 @@ public class ProductServiceImpl implements IProductService {
     @Override
     public ProductFinalDto getProduct(Integer productId) {
         Product product = productRepository.findById(productId).
-                orElseThrow(() -> new ResourceNotFoundException("Product Not Found!"));
+                orElseThrow(() -> new ResourceNotFoundException("Product not found!"));
         return ProductMapper.mapToProductFinalDto(product, productCategoryService, productBrandService);
     }
 
@@ -40,17 +39,14 @@ public class ProductServiceImpl implements IProductService {
     public List<ProductFinalDto> getAllProducts() {
         List<Product> products = productRepository.findAll();
         return products.stream().map((product) -> ProductMapper.
-                        mapToProductFinalDto(
-                                product,
-                                productCategoryService,
-                                productBrandService)
-                ).
-                collect(Collectors.toList());
+                mapToProductFinalDto(
+                        product,
+                        productCategoryService,
+                        productBrandService)).collect(Collectors.toList());
     }
 
     @Override
     public Object addProduct(ProductDto productDto) {
-
         boolean productIdExists = Objects.nonNull(productDto.getProductId());
         if (productIdExists) {
             if (productRepository.existsById(productDto.getProductId())) {
@@ -85,11 +81,6 @@ public class ProductServiceImpl implements IProductService {
         return HttpStatus.NOT_FOUND;
     }
 
-    @Override
-    public boolean isProductExists(Integer productId) {
-        return productRepository.existsById(productId);
-    }
-
     private Object validateAndSaveOrUpdateProduct(List<ProductDto> productDtoList) {
         if (!HelperFunctions.getProductValidationStatus(productDtoList)) {
             return HttpStatus.BAD_REQUEST;
@@ -100,7 +91,8 @@ public class ProductServiceImpl implements IProductService {
         } else {
             List<Product> products = productRepository.
                     saveAll(productDtoList.stream().map(ProductMapper::mapToProduct).collect(Collectors.toList()));
-            return products.stream().map((product) -> ProductMapper.mapToProductFinalDto(product, productCategoryService, productBrandService)).toList();
+            return products.stream().map((product) ->
+                    ProductMapper.mapToProductFinalDto(product, productCategoryService, productBrandService)).toList();
         }
     }
 }

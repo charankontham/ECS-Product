@@ -7,26 +7,8 @@ import com.ecs.ecs_product.dto.ProductFinalDto;
 import com.ecs.ecs_product.entity.Product;
 import com.ecs.ecs_product.service.interfaces.IProductBrandService;
 import com.ecs.ecs_product.service.interfaces.IProductCategoryService;
-import com.ecs.ecs_product.util.HelperFunctions;
-import java.util.List;
 
 public class ProductMapper {
-
-    public static ProductDto mapToProductDto(Product product) {
-        return new ProductDto(
-                product.getProductId(),
-                product.getProductCategoryId(),
-                product.getProductBrandId(),
-                product.getProductName(),
-                product.getProductDescription(),
-                product.getProductPrice(),
-                product.getProductQuantity(),
-                product.getProductColor(),
-                product.getProductWeight(),
-                product.getProductDimensions(),
-                product.getProductCondition()
-        );
-    }
 
     public static Product mapToProduct(ProductDto productDto) {
         return new Product(
@@ -80,18 +62,5 @@ public class ProductMapper {
                 productFinalDto.getProductDimensions(),
                 productFinalDto.getProductCondition()
         );
-    }
-
-    public static List<ProductFinalDto> mapProductQuantitiesWithProductFinalDtoList(
-            String productIds,
-            String productQuantities) {
-        int count = 0;
-        List<Integer> productIdsList = HelperFunctions.mapToIntegerArrayList(productIds);
-        List<Integer> productQuantitiesList = HelperFunctions.mapToIntegerArrayList(productQuantities);
-        List<ProductFinalDto> productFinalDtoList =  HelperFunctions.getProductFinalDtoList(productIdsList);
-        for(ProductFinalDto productFinalDto : productFinalDtoList) {
-            productFinalDto.setProductQuantity(productQuantitiesList.get(count));
-        }
-        return productFinalDtoList;
     }
 }

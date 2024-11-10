@@ -1,11 +1,12 @@
 package com.ecs.ecs_product.service.interfaces;
 
 import com.ecs.ecs_product.dto.ProductCategoryDto;
+
 import java.util.List;
 
 public interface IProductCategoryService {
 
-    ProductCategoryDto getProductCategoryById(int categoryId);
+    ProductCategoryDto getProductCategoryById(Integer categoryId);
 
     List<ProductCategoryDto> getAllProductCategories();
 
@@ -13,7 +14,7 @@ public interface IProductCategoryService {
 
     ProductCategoryDto updateProductCategory(ProductCategoryDto productCategoryDto);
 
-    boolean deleteProductCategory(int categoryId);
+    boolean deleteProductCategory(Integer categoryId);
 
-    boolean isProductCategoryExists(int categoryId);
+    boolean isProductCategoryExists(Integer categoryId);
 }

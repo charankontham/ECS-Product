@@ -14,11 +14,7 @@ public interface IProductService {
 
     Object addProduct(ProductDto productDto);
 
-//    Object updateProducts(ProductFinalDto productFinalDto);
-
     Object updateProducts(List<ProductFinalDto> productFinalDtoList);
 
     HttpStatus deleteProduct(Integer productId);
-
-    boolean isProductExists(Integer productId);
 }

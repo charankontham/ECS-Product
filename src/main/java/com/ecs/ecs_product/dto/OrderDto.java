@@ -13,9 +13,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrderDto {
-    private int orderId;
-    private int customerId;
-    private int addressId;
+    private Integer orderId;
+    private Integer customerId;
+    private Integer addressId;
     private List<Integer> productIds;
     private List<Integer> productQuantities;
     private String paymentType;

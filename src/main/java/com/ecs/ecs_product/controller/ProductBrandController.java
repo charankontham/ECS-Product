@@ -13,12 +13,11 @@ import java.util.Objects;
 @RestController
 @RequestMapping("/api/productBrand")
 public class ProductBrandController {
-
     @Autowired
     private IProductBrandService productBrandService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductBrandDto> getProductBrandById(@PathVariable("id") int brandId) {
+    public ResponseEntity<ProductBrandDto> getProductBrandById(@PathVariable("id") Integer brandId) {
         ProductBrandDto productBrandDto = productBrandService.getProductBrandById(brandId);
         return ResponseEntity.ok(productBrandDto);
     }
@@ -32,31 +31,31 @@ public class ProductBrandController {
     @PostMapping
     public ResponseEntity<?> addProductBrand(@RequestBody ProductBrandDto productBrandDto) {
         Object response = productBrandService.addProductBrand(productBrandDto);
-        if(Objects.equals(response, HttpStatus.CONFLICT)){
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Product brand already exists!");
+        if (Objects.equals(response, HttpStatus.CONFLICT)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Duplicate entry!");
         } else if (Objects.equals(response, HttpStatus.BAD_REQUEST)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Validation Failed!");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Validation failed!");
         }
-        return new ResponseEntity<>(response,HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PutMapping
     public ResponseEntity<?> updateProductBrand(@RequestBody ProductBrandDto productBrandDto) {
         Object response = productBrandService.updateProductBrand(productBrandDto);
-        if(Objects.equals(response, HttpStatus.NOT_FOUND)){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("ProductBrand Not Found!");
-        }else if (Objects.equals(response, HttpStatus.BAD_REQUEST)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Validation Failed!");
+        if (Objects.equals(response, HttpStatus.NOT_FOUND)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product brand not found!");
+        } else if (Objects.equals(response, HttpStatus.BAD_REQUEST)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Validation failed!");
         }
-        return new ResponseEntity<>(response,HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteProductBrand(@PathVariable("id") int brandId) {
+    public ResponseEntity<?> deleteProductBrand(@PathVariable("id") Integer brandId) {
         boolean response = productBrandService.deleteProductBrand(brandId);
-        if(response){
-            return ResponseEntity.status(HttpStatus.OK).body("Product brand Deleted Successfully!");
+        if (response) {
+            return ResponseEntity.status(HttpStatus.OK).body("Product brand deleted successfully!");
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("ProductBrand Not Found!");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product brand not found!");
     }
 }

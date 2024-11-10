@@ -1,101 +1,49 @@
 package com.ecs.ecs_product.util;
 
 import com.ecs.ecs_product.dto.*;
-import com.ecs.ecs_product.feign.OrderService;
 import com.ecs.ecs_product.service.interfaces.*;
 import com.ecs.ecs_product.validations.ProductValidation;
 import lombok.Setter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Setter
 public class HelperFunctions {
 
-    public static IProductService productService;
-
-    public static List<Integer> mapToIntegerArrayList(String str) {
-        return Arrays.stream(str.
-                        replaceAll("[ \\[\\]]", "").
-                        split(",")).
-                map(Integer::parseInt).
-                collect(Collectors.toList());
-    }
-
-    public static List<ProductFinalDto> getProductFinalDtoList(
-            List<Integer> productIdsList
-    ) {
-        return productIdsList.stream().map(productService::getProduct).toList();
-    }
-
     public static ResponseEntity<?> getResponseEntity(Object response) {
         if (Objects.equals(response, Constants.ProductNotFound)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product Not Found!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found!");
         } else if (Objects.equals(response, Constants.CustomerNotFound)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Customer Not Found!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Customer not found!");
         } else if (Objects.equals(response, Constants.ProductQuantityExceeded)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ProductQuantities Exceeded!");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product quantities exceeded!");
         } else if (Objects.equals(response, Constants.AddressNotFound)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Address Not Found!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Address not found!");
         } else if (Objects.equals(response, Constants.OrderNotFound)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Order Not Found!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Order not found!");
         } else if (Objects.equals(response, Constants.CartNotFound)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cart Not Found!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cart not found!");
         } else if (Objects.equals(response, Constants.UserNotFound)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User Not Found!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found!");
         } else if (Objects.equals(response, Constants.ProductCategoryNotFound)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("ProductCategory Not Found!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product category not found!");
         } else if (Objects.equals(response, Constants.ProductBrandNotFound)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("ProductBrand Not Found!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product brand not found!");
         } else if (Objects.equals(response, Constants.ProductReviewNotFound)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("ProductReview Not Found!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product review not found!");
         } else if (Objects.equals(response, HttpStatus.CONFLICT)) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Duplicate Entry!");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Duplicate entry!");
         } else if (Objects.equals(response, HttpStatus.BAD_REQUEST)) {
-            return new ResponseEntity<>("Validation Failed/Bad Request!", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Validation failed/Bad request!", HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-//    public static void removeCartItemsByProductId(Integer productId, OrderService orderService) {
-//        List<CartDto> carts = orderService.getCartsByProductId(productId).getBody();
-//        for (CartDto cartDto : Objects.requireNonNull(carts)) {
-//            List<Integer> productIds = cartDto.getProductIds();
-//            List<Integer> productQuantities = cartDto.getProductQuantities();
-//            if (productIds.size() == 1) {
-//                orderService.deleteCart(cartDto.getCartId());
-//            } else {
-//                productQuantities.remove(productIds.indexOf(productId));
-//                productIds.remove(productId);
-//                cartDto.setProductIds(productIds);
-//                cartDto.setProductQuantities(productQuantities);
-//                orderService.updateCart(cartDto);
-//            }
-//        }
-//    }
-
-//    public static void removeOrderItemsByProductId(Integer productId, OrderService orderService) {
-//        List<OrderDto> orders = orderService.getAllOrdersByProductId(productId).getBody();
-//        for (OrderDto orderDto : Objects.requireNonNull(orders)) {
-//            List<Integer> productIds = orderDto.getProductIds();
-//            List<Integer> productQuantities = orderDto.getProductQuantities();
-//            if (productIds.size() == 1) {
-//                orderService.deleteOrder(orderDto.getOrderId());
-//            } else {
-//                productQuantities.remove(productIds.indexOf(productId));
-//                productIds.remove(productId);
-//                orderDto.setProductIds(productIds);
-//                orderDto.setProductQuantities(productQuantities);
-//                orderService.updateOrder(orderDto);
-//            }
-//        }
-//    }
-
     public static boolean getProductValidationStatus(List<ProductDto> productDtoList) {
         List<ProductDto> filteredProductDtoList = productDtoList.stream().filter(
-                ProductValidation::isProductDtoSchemaValid
-        ).toList();
+                ProductValidation::isProductDtoSchemaValid).toList();
         return filteredProductDtoList.size() == productDtoList.size();
     }
 
@@ -103,10 +51,8 @@ public class HelperFunctions {
             List<ProductDto> productDtoList,
             IProductCategoryService productCategoryService) {
         List<ProductDto> filteredProductDtoList = productDtoList.stream().
-                filter(
-                        (productDto) -> productCategoryService.isProductCategoryExists(
-                                productDto.getProductCategoryId())).
-                toList();
+                filter((productDto) -> productCategoryService.isProductCategoryExists(
+                        productDto.getProductCategoryId())).toList();
         return filteredProductDtoList.size() == productDtoList.size();
     }
 
@@ -114,10 +60,8 @@ public class HelperFunctions {
             List<ProductDto> productDtoList,
             IProductBrandService productBrandService) {
         List<ProductDto> filteredProductDtoList = productDtoList.stream().
-                filter(
-                        (productDto) -> productBrandService.isProductBrandExists(
-                                productDto.getProductBrandId())).
-                toList();
+                filter((productDto) -> productBrandService.isProductBrandExists(
+                        productDto.getProductBrandId())).toList();
         return filteredProductDtoList.size() == productDtoList.size();
     }
 }

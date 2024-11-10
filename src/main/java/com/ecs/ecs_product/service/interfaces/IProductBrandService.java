@@ -1,11 +1,12 @@
 package com.ecs.ecs_product.service.interfaces;
 
 import com.ecs.ecs_product.dto.ProductBrandDto;
+
 import java.util.List;
 
 public interface IProductBrandService {
 
-    ProductBrandDto getProductBrandById(int brandId);
+    ProductBrandDto getProductBrandById(Integer brandId);
 
     List<ProductBrandDto> getAllProductBrands();
 
@@ -13,9 +14,7 @@ public interface IProductBrandService {
 
     Object updateProductBrand(ProductBrandDto productBrandDto);
 
-    boolean deleteProductBrand(int brandId);
+    boolean deleteProductBrand(Integer brandId);
 
-    boolean isProductBrandExists(int brandId);
-
-
+    boolean isProductBrandExists(Integer brandId);
 }

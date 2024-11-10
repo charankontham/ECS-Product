@@ -10,19 +10,19 @@ import com.ecs.ecs_product.validations.BasicValidation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class ProductBrandServiceImpl implements IProductBrandService {
-
     @Autowired
     private ProductBrandRepository productBrandRepository;
 
     @Override
-    public ProductBrandDto getProductBrandById(int brandId) {
+    public ProductBrandDto getProductBrandById(Integer brandId) {
         ProductBrand productBrand = productBrandRepository.findById(brandId).
-                orElseThrow(() -> new ResourceNotFoundException("Product Brand Not Found!"));
+                orElseThrow(() -> new ResourceNotFoundException("Product brand not found!"));
         return ProductBrandMapper.mapToProductBrandDto(productBrand);
     }
 
@@ -36,10 +36,10 @@ public class ProductBrandServiceImpl implements IProductBrandService {
     @Override
     public Object addProductBrand(ProductBrandDto productBrandDto) {
         boolean productBrandExists = productBrandRepository.existsById(productBrandDto.getBrandId());
-        if(!BasicValidation.stringValidation(productBrandDto.getBrandName())){
+        if (!BasicValidation.stringValidation(productBrandDto.getBrandName())) {
             return HttpStatus.BAD_REQUEST;
         }
-        if(!productBrandExists) {
+        if (!productBrandExists) {
             ProductBrand productBrand = productBrandRepository.save(ProductBrandMapper.mapToProductBrand(productBrandDto));
             return ProductBrandMapper.mapToProductBrandDto(productBrand);
         }
@@ -49,10 +49,10 @@ public class ProductBrandServiceImpl implements IProductBrandService {
     @Override
     public Object updateProductBrand(ProductBrandDto productBrandDto) {
         boolean productBrandExists = productBrandRepository.existsById(productBrandDto.getBrandId());
-        if(!BasicValidation.stringValidation(productBrandDto.getBrandName())){
+        if (!BasicValidation.stringValidation(productBrandDto.getBrandName())) {
             return HttpStatus.BAD_REQUEST;
         }
-        if(productBrandExists) {
+        if (productBrandExists) {
             ProductBrand productBrand = productBrandRepository.save(ProductBrandMapper.mapToProductBrand(productBrandDto));
             return ProductBrandMapper.mapToProductBrandDto(productBrand);
         }
@@ -60,9 +60,9 @@ public class ProductBrandServiceImpl implements IProductBrandService {
     }
 
     @Override
-    public boolean deleteProductBrand(int brandId) {
+    public boolean deleteProductBrand(Integer brandId) {
         boolean isDeleted = productBrandRepository.existsById(brandId);
-        if(isDeleted){
+        if (isDeleted) {
             productBrandRepository.deleteById(brandId);
             return true;
         }
@@ -70,7 +70,7 @@ public class ProductBrandServiceImpl implements IProductBrandService {
     }
 
     @Override
-    public boolean isProductBrandExists(int brandId) {
+    public boolean isProductBrandExists(Integer brandId) {
         return productBrandRepository.existsById(brandId);
     }
 }

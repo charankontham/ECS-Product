@@ -13,14 +13,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class UserAuthenticationDetails implements UserDetailsService {
-
     @Autowired
     private CustomerService customerService;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         if (customerService.getUserByUsername(username).getStatusCode() != HttpStatus.OK) {
-            throw new ResourceNotFoundException("User not found");
+            throw new ResourceNotFoundException("User not found!");
         } else {
             UserDto userDto = customerService.getUserByUsername(username).getBody();
             return new UserPrincipal(userDto);

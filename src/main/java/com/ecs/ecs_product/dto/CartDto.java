@@ -12,8 +12,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CartDto {
-    private int cartId;
-    private int customerId;
+    private Integer cartId;
+    private Integer customerId;
     private List<Integer> productIds;
     private List<Integer> productQuantities;
 }

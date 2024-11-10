@@ -10,9 +10,9 @@ import lombok.Setter;
 @Setter
 @Getter
 public class ProductReviewDto {
-    private int reviewId;
-    private int productId;
-    private int customerId;
+    private Integer reviewId;
+    private Integer productId;
+    private Integer customerId;
     private String productReview;
-    private float productRating;
+    private Float productRating;
 }

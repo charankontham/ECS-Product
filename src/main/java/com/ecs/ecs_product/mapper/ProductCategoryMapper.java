@@ -10,6 +10,7 @@ public class ProductCategoryMapper {
                 productCategory.getProductCategoryName()
         );
     }
+
     public static ProductCategory mapToProductCategory(ProductCategoryDto productCategoryDto) {
         return new ProductCategory(
                 productCategoryDto.getCategoryId(),
