@@ -35,7 +35,7 @@ public class ProductBrandServiceImpl implements IProductBrandService {
 
     @Override
     public Object addProductBrand(ProductBrandDto productBrandDto) {
-        boolean productBrandExists = productBrandRepository.existsById(productBrandDto.getBrandId());
+        boolean productBrandExists = productBrandDto.getBrandId() != null && productBrandRepository.existsById(productBrandDto.getBrandId());
         if (!BasicValidation.stringValidation(productBrandDto.getBrandName())) {
             return HttpStatus.BAD_REQUEST;
         }

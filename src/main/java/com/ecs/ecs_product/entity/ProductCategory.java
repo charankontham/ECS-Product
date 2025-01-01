@@ -21,4 +21,7 @@ public class ProductCategory {
     @Column(name = "category_name")
     private String productCategoryName;
 
+    @Column(name = "category_image")
+    private String categoryImage;
+
 }

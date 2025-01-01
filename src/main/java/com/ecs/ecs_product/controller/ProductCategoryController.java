@@ -23,7 +23,7 @@ public class ProductCategoryController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<?> getAllProductCategory() {
+    public ResponseEntity<?> getAllProductCategories() {
         List<ProductCategoryDto> productCategories = productCategoryService.getAllProductCategories();
         return ResponseEntity.ok(productCategories);
     }

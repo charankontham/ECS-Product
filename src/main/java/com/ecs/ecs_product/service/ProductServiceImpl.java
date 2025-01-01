@@ -39,10 +39,27 @@ public class ProductServiceImpl implements IProductService {
     public List<ProductFinalDto> getAllProducts() {
         List<Product> products = productRepository.findAll();
         return products.stream().map((product) -> ProductMapper.
-                mapToProductFinalDto(
-                        product,
-                        productCategoryService,
-                        productBrandService)).collect(Collectors.toList());
+                        mapToProductFinalDto(
+                                product,
+                                productCategoryService,
+                                productBrandService)).toList()
+                .stream().filter(x -> x.getProductId() != 9).toList();
+    }
+
+    @Override
+    public List<ProductFinalDto> getProductsByCategoryId(Integer categoryId) {
+        List<Product> products = productRepository.getProductsByProductCategoryId(categoryId);
+        return products.stream().map((product) -> ProductMapper.
+                        mapToProductFinalDto(
+                                product,
+                                productCategoryService,
+                                productBrandService)).toList()
+                .stream().filter(x -> x.getProductId() != 9).toList();
+    }
+
+    @Override
+    public List<ProductFinalDto> getSimilarProductsById(Integer productId) {
+        return List.of();
     }
 
     @Override

@@ -33,6 +33,9 @@ public class Product {
     @Column(name ="product_quantity")
     private Integer productQuantity;
 
+    @Column(name ="product_image")
+    private String productImage;
+
     @Column(name = "product_color")
     private String productColor;
 

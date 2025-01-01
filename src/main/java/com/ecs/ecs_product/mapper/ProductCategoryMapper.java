@@ -7,14 +7,16 @@ public class ProductCategoryMapper {
     public static ProductCategoryDto mapToProductCategoryDto(ProductCategory productCategory) {
         return new ProductCategoryDto(
                 productCategory.getCategoryId(),
-                productCategory.getProductCategoryName()
+                productCategory.getProductCategoryName(),
+                productCategory.getCategoryImage()
         );
     }
 
     public static ProductCategory mapToProductCategory(ProductCategoryDto productCategoryDto) {
         return new ProductCategory(
                 productCategoryDto.getCategoryId(),
-                productCategoryDto.getCategoryName()
+                productCategoryDto.getCategoryName(),
+                productCategoryDto.getCategoryImage()
         );
     }
 }

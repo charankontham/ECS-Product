@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -20,7 +21,7 @@ public class OrderDto {
     private List<Integer> productQuantities;
     private String paymentType;
     private String paymentStatus;
-    private Date orderDate;
-    private Date deliveryDate;
+    private LocalDateTime orderDate;
+    private LocalDateTime deliveryDate;
     private String shippingStatus;
 }

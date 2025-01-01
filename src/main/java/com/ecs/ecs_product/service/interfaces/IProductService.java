@@ -12,6 +12,10 @@ public interface IProductService {
 
     List<ProductFinalDto> getAllProducts();
 
+    List<ProductFinalDto> getProductsByCategoryId(Integer categoryId);
+
+    List<ProductFinalDto> getSimilarProductsById(Integer productId);
+
     Object addProduct(ProductDto productDto);
 
     Object updateProducts(List<ProductFinalDto> productFinalDtoList);

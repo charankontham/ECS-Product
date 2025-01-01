@@ -31,7 +31,8 @@ public class ProductCategoryServiceImpl implements IProductCategoryService {
     @Override
     public List<ProductCategoryDto> getAllProductCategories() {
         List<ProductCategory> productCategories = productCategoryRepository.findAll();
-        return productCategories.stream().map(ProductCategoryMapper::mapToProductCategoryDto).collect(Collectors.toList());
+        return productCategories.stream().map(ProductCategoryMapper::mapToProductCategoryDto).toList()
+                .stream().filter( x -> x.getCategoryId() != 24).toList();
     }
 
     @Override

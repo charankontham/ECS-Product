@@ -1,4 +1,4 @@
-package com.ecs.ecs_product.feign;
+package com.ecs.ecs_product.config;
 
 import feign.RequestInterceptor;
 import jakarta.servlet.http.HttpServletRequest;

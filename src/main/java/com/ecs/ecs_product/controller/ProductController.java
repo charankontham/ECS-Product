@@ -28,6 +28,18 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
+    @GetMapping("/getProductsByCategoryId/{id}")
+    public ResponseEntity<List<ProductFinalDto>> getAllProducts(@PathVariable("id") Integer categoryId) {
+        List<ProductFinalDto> products = productService.getProductsByCategoryId(categoryId);
+        return ResponseEntity.ok(products);
+    }
+
+    @GetMapping("/getSimilarProductsById/{id}")
+    public ResponseEntity<List<ProductFinalDto>> getSimilarProducts(@PathVariable("id") Integer productId) {
+        List<ProductFinalDto> products = productService.getProductsByCategoryId(productId);
+        return ResponseEntity.ok(products);
+    }
+
     @PostMapping
     public ResponseEntity<?> addProduct(@RequestBody ProductDto productDto) {
         Object response = productService.addProduct(productDto);
