@@ -17,12 +17,16 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
+
 @Service
 public class ProductServiceImpl implements IProductService {
     @Autowired
     private ProductRepository productRepository;
     @Autowired
     private IProductCategoryService productCategoryService;
+    @Autowired
+    private ISubCategoryService subCategoryService;
     @Autowired
     private IProductBrandService productBrandService;
     @Autowired
@@ -32,7 +36,7 @@ public class ProductServiceImpl implements IProductService {
     public ProductFinalDto getProduct(Integer productId) {
         Product product = productRepository.findById(productId).
                 orElseThrow(() -> new ResourceNotFoundException("Product not found!"));
-        return ProductMapper.mapToProductFinalDto(product, productCategoryService, productBrandService);
+        return ProductMapper.mapToProductFinalDto(product, subCategoryService, productBrandService);
     }
 
     @Override
@@ -41,7 +45,7 @@ public class ProductServiceImpl implements IProductService {
         return products.stream().map((product) -> ProductMapper.
                         mapToProductFinalDto(
                                 product,
-                                productCategoryService,
+                                subCategoryService,
                                 productBrandService)).toList()
                 .stream().filter(x -> x.getProductId() != 9).toList();
     }
@@ -52,14 +56,62 @@ public class ProductServiceImpl implements IProductService {
         return products.stream().map((product) -> ProductMapper.
                         mapToProductFinalDto(
                                 product,
-                                productCategoryService,
+                                subCategoryService,
                                 productBrandService)).toList()
                 .stream().filter(x -> x.getProductId() != 9).toList();
     }
 
     @Override
-    public List<ProductFinalDto> getSimilarProductsById(Integer productId) {
-        return List.of();
+    public List<ProductDto> getSimilarProductsById(Integer productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+        final int TARGET_SIZE = 10;
+        final double PRICE_THRESHOLD = product.getProductPrice() * 0.2;
+        double minPrice = product.getProductPrice() - PRICE_THRESHOLD;
+        double maxPrice = product.getProductPrice() + PRICE_THRESHOLD;
+        /* Filtering all the product category items **/
+        List<Product> similarProducts = productRepository.findByProductCategoryIdAndProductIdNot(
+                product.getProductCategoryId(), productId);
+        System.out.println("similar products after category matching: ");
+        System.out.println(similarProducts.stream().map(Object::toString).toList());
+
+        /* Filter products with sub category or price range of +-50 or brand **/
+        if (similarProducts.size() > TARGET_SIZE) {
+            similarProducts = similarProducts.stream()
+                    .filter(
+                            (currProduct) ->
+                                    (currProduct.getProductPrice() >= minPrice &&
+                                            currProduct.getProductPrice() <= maxPrice) ||
+                                            (Objects.equals(currProduct.getProductBrandId(),
+                                                    product.getProductBrandId()) ||
+                                                    (Objects.equals(currProduct.getSubCategoryId(),
+                                                            product.getSubCategoryId())))).toList();
+        }
+        /* Filter products with sub category and brand only **/
+        if(similarProducts.size() > TARGET_SIZE) {
+            similarProducts = similarProducts.stream()
+                    .filter((currProduct) ->
+                            (Objects.equals(currProduct.getProductBrandId(),
+                                    product.getProductBrandId()) ||
+                                    (Objects.equals(currProduct.getSubCategoryId(),
+                                            product.getSubCategoryId())))).toList();
+        }
+        /* Filter products with same price range only **/
+        if(similarProducts.size() > TARGET_SIZE) {
+            similarProducts = similarProducts.stream()
+                    .filter((currProduct) ->
+                            (currProduct.getProductPrice() < maxPrice &&
+                                    currProduct.getProductPrice() > minPrice)).toList();
+        }
+//        similarProducts = similarProducts.stream()
+//                .filter(p -> Objects.equals(p.getProductBrandId(), product.getProductBrandId()) ||
+//                        Math.abs(p.getProductPrice() - product.getProductPrice()) <= product.getProductPrice() * 0.2)
+//                .toList();
+//        System.out.println("similar products after brand or price matching: ");
+//        System.out.println(similarProducts.stream().map(Object::toString).toList());
+        return similarProducts.stream().map(ProductMapper::mapToProductDto).
+                toList().
+                subList(0, Math.min(similarProducts.size(), 10));
     }
 
     @Override
@@ -107,9 +159,9 @@ public class ProductServiceImpl implements IProductService {
             return Constants.ProductCategoryNotFound;
         } else {
             List<Product> products = productRepository.
-                    saveAll(productDtoList.stream().map(ProductMapper::mapToProduct).collect(Collectors.toList()));
+                    saveAll(productDtoList.stream().map(ProductMapper::mapToProduct).collect(toList()));
             return products.stream().map((product) ->
-                    ProductMapper.mapToProductFinalDto(product, productCategoryService, productBrandService)).toList();
+                    ProductMapper.mapToProductFinalDto(product, subCategoryService, productBrandService)).toList();
         }
     }
 }

@@ -14,7 +14,7 @@ public interface IProductService {
 
     List<ProductFinalDto> getProductsByCategoryId(Integer categoryId);
 
-    List<ProductFinalDto> getSimilarProductsById(Integer productId);
+    List<ProductDto> getSimilarProductsById(Integer productId);
 
     Object addProduct(ProductDto productDto);
 

@@ -18,6 +18,9 @@ public class Product {
     @Column(name = "product_category_id")
     private Integer productCategoryId;
 
+    @Column(name = "sub_category_id")
+    private Integer subCategoryId;
+
     @Column(name ="product_brand_id")
     private Integer productBrandId;
 
@@ -48,4 +51,9 @@ public class Product {
     @Column(name = "product_condition")
     private String productCondition;
 
+    @Override
+    public String toString() {
+        return
+                "\nproductId=" + productId;
+    }
 }

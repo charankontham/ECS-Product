@@ -33,6 +33,8 @@ public class HelperFunctions {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product brand not found!");
         } else if (Objects.equals(response, Constants.ProductReviewNotFound)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product review not found!");
+        } else if (Objects.equals(response, Constants.SubCategoryNotFound)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sub category not found!");
         } else if (Objects.equals(response, HttpStatus.CONFLICT)) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Duplicate entry!");
         } else if (Objects.equals(response, HttpStatus.BAD_REQUEST)) {

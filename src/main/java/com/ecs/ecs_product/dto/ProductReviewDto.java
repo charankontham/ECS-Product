@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Setter
@@ -13,6 +15,9 @@ public class ProductReviewDto {
     private Integer reviewId;
     private Integer productId;
     private Integer customerId;
+    private String customerName;
+    private Integer productRating;
+    private String reviewHeadline;
     private String productReview;
-    private Float productRating;
+    private LocalDateTime reviewDate;
 }

@@ -35,8 +35,8 @@ public class ProductController {
     }
 
     @GetMapping("/getSimilarProductsById/{id}")
-    public ResponseEntity<List<ProductFinalDto>> getSimilarProducts(@PathVariable("id") Integer productId) {
-        List<ProductFinalDto> products = productService.getProductsByCategoryId(productId);
+    public ResponseEntity<List<ProductDto>> getSimilarProducts(@PathVariable("id") Integer productId) {
+        List<ProductDto> products = productService.getSimilarProductsById(productId);
         return ResponseEntity.ok(products);
     }
 
