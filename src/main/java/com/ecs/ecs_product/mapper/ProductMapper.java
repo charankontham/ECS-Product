@@ -21,6 +21,8 @@ public class ProductMapper {
                 productDto.getProductImage(),
                 productDto.getProductColor(),
                 productDto.getProductWeight(),
+                productDto.getDateAdded(),
+                productDto.getDateModified(),
                 productDto.getProductDimensions(),
                 productDto.getProductCondition()
         );
@@ -39,6 +41,8 @@ public class ProductMapper {
                 product.getProductImage(),
                 product.getProductColor(),
                 product.getProductWeight(),
+                product.getDateAdded(),
+                product.getDateModified(),
                 product.getProductDimensions(),
                 product.getProductCondition()
         );
@@ -49,7 +53,7 @@ public class ProductMapper {
             ISubCategoryService subCategoryService,
             IProductBrandService productBrandService
     ) {
-        SubCategoryEnriched subCategory = subCategoryService.getEnrichedSubCategoryById(product.getProductCategoryId());
+        SubCategoryEnriched subCategory = subCategoryService.getEnrichedSubCategoryById(product.getSubCategoryId());
         ProductBrandDto productBrandDto = productBrandService.getProductBrandById(product.getProductBrandId());
         return new ProductFinalDto(
                 product.getProductId(),
@@ -62,6 +66,8 @@ public class ProductMapper {
                 product.getProductImage(),
                 product.getProductColor(),
                 product.getProductWeight(),
+                product.getDateAdded(),
+                product.getDateModified(),
                 product.getProductDimensions(),
                 product.getProductCondition()
         );
@@ -80,6 +86,8 @@ public class ProductMapper {
                 productFinalDto.getProductImage(),
                 productFinalDto.getProductColor(),
                 productFinalDto.getProductWeight(),
+                productFinalDto.getDateAdded(),
+                productFinalDto.getDateModified(),
                 productFinalDto.getProductDimensions(),
                 productFinalDto.getProductCondition()
         );

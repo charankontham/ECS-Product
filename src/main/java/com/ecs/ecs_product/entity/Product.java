@@ -3,6 +3,8 @@ package com.ecs.ecs_product.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Setter
 @Getter
 @AllArgsConstructor
@@ -44,6 +46,12 @@ public class Product {
 
     @Column(name = "product_weight")
     private Float productWeight;
+
+    @Column(name = "date_added", updatable = false)
+    private LocalDateTime dateAdded;
+
+    @Column(name = "date_modified")
+    private LocalDateTime dateModified;
 
     @Column(name = "product_dimensions")
     private String productDimensions;

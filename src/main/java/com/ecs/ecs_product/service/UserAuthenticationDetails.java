@@ -7,6 +7,7 @@ import com.ecs.ecs_product.dto.UserPrincipal;
 import com.ecs.ecs_product.exception.ResourceNotFoundException;
 import com.ecs.ecs_product.feign.AdminService;
 import com.ecs.ecs_product.feign.CustomerService;
+import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,14 +28,18 @@ public class UserAuthenticationDetails implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        ResponseEntity<CustomerDto> customerResponse = customerService.getCustomerByEmail(username);
-        ResponseEntity<AdminDto> adminResponse = adminService.getByUsername(username);
-        if (Objects.nonNull(customerResponse.getBody()) || customerResponse.getStatusCode() == HttpStatus.OK) {
-            return new UserPrincipal(customerResponse.getBody());
-        } else if(Objects.nonNull(adminResponse.getBody()) || adminResponse.getStatusCode() == HttpStatus.OK){
-            return new UserPrincipal(adminResponse.getBody());
-        }else{
-            throw new ResourceNotFoundException("User not found");
+        try {
+            ResponseEntity<CustomerDto> customerResponse = customerService.getCustomerByEmail(username);
+            if (Objects.nonNull(customerResponse.getBody()) || customerResponse.getStatusCode() == HttpStatus.OK) {
+                return new UserPrincipal(customerResponse.getBody());
+            }
+        }catch(FeignException.Unauthorized ex){
+            System.out.println("Customer not found, Now checking admin...");
         }
+        ResponseEntity<AdminDto> adminResponse = adminService.getByUsername(username);
+        if(Objects.nonNull(adminResponse.getBody()) || adminResponse.getStatusCode() == HttpStatus.OK){
+            return new UserPrincipal(adminResponse.getBody());
+        }
+        throw new ResourceNotFoundException("User not found");
     }
 }

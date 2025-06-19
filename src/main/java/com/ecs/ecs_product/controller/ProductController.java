@@ -5,6 +5,9 @@ import com.ecs.ecs_product.dto.ProductFinalDto;
 import com.ecs.ecs_product.service.interfaces.IProductService;
 import com.ecs.ecs_product.util.HelperFunctions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,9 +31,28 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
+    @GetMapping("/getProductsByPagination")
+    public ResponseEntity<Page<ProductFinalDto>> getProductsByPagination(
+            @RequestParam(defaultValue = "0", name = "currentPage") Integer pageNumber,
+            @RequestParam(defaultValue = "10", name = "offset") Integer itemSize,
+            @RequestParam(required = false, name="categoryId") Integer categoryId,
+            @RequestParam(required = false, name="subCategoryId") Integer subCategoryId,
+            @RequestParam(required = false, name="brandId") Integer brandId,
+            @RequestParam(required = false, name="searchValue") String searchValue) {
+        Pageable pageable = PageRequest.of(pageNumber, itemSize);
+        Page<ProductFinalDto> products = productService.getProductsByPagination(pageable, categoryId, subCategoryId, brandId, searchValue);
+        return ResponseEntity.ok(products);
+    }
+
     @GetMapping("/getProductsByCategoryId/{id}")
-    public ResponseEntity<List<ProductFinalDto>> getAllProducts(@PathVariable("id") Integer categoryId) {
+    public ResponseEntity<List<ProductFinalDto>> getAllProductsByCategoryId(@PathVariable("id") Integer categoryId) {
         List<ProductFinalDto> products = productService.getProductsByCategoryId(categoryId);
+        return ResponseEntity.ok(products);
+    }
+
+    @GetMapping("/getProductsByBrandId/{id}")
+    public ResponseEntity<List<ProductFinalDto>> getAllProductsByBrandId(@PathVariable("id") Integer brandId) {
+        List<ProductFinalDto> products = productService.getProductsByBrandId(brandId);
         return ResponseEntity.ok(products);
     }
 

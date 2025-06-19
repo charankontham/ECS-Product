@@ -10,9 +10,14 @@ import com.ecs.ecs_product.service.interfaces.*;
 import com.ecs.ecs_product.util.Constants;
 import com.ecs.ecs_product.util.HelperFunctions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -46,8 +51,22 @@ public class ProductServiceImpl implements IProductService {
                         mapToProductFinalDto(
                                 product,
                                 subCategoryService,
-                                productBrandService)).toList()
-                .stream().filter(x -> x.getProductId() != 9).toList();
+                                productBrandService)).toList();
+    }
+
+    @Override
+    public Page<ProductFinalDto> getProductsByPagination(
+            Pageable pageable,
+            Integer categoryId,
+            Integer subCategoryId,
+            Integer brandId,
+            String searchValue) {
+        return productRepository.findFilteredProducts(pageable, categoryId, subCategoryId, brandId, searchValue)
+                .map((product) -> ProductMapper.
+                        mapToProductFinalDto(
+                                product,
+                                subCategoryService,
+                                productBrandService));
     }
 
     @Override
@@ -57,8 +76,17 @@ public class ProductServiceImpl implements IProductService {
                         mapToProductFinalDto(
                                 product,
                                 subCategoryService,
-                                productBrandService)).toList()
-                .stream().filter(x -> x.getProductId() != 9).toList();
+                                productBrandService)).toList();
+    }
+
+    @Override
+    public List<ProductFinalDto> getProductsByBrandId(Integer brandId) {
+        List<Product> products = productRepository.getProductsByProductBrandId(brandId);
+        return products.stream().map((product) -> ProductMapper.
+                        mapToProductFinalDto(
+                                product,
+                                subCategoryService,
+                                productBrandService)).toList();
     }
 
     @Override
@@ -88,7 +116,7 @@ public class ProductServiceImpl implements IProductService {
                                                             product.getSubCategoryId())))).toList();
         }
         /* Filter products with sub category and brand only **/
-        if(similarProducts.size() > TARGET_SIZE) {
+        if (similarProducts.size() > TARGET_SIZE) {
             similarProducts = similarProducts.stream()
                     .filter((currProduct) ->
                             (Objects.equals(currProduct.getProductBrandId(),
@@ -97,7 +125,7 @@ public class ProductServiceImpl implements IProductService {
                                             product.getSubCategoryId())))).toList();
         }
         /* Filter products with same price range only **/
-        if(similarProducts.size() > TARGET_SIZE) {
+        if (similarProducts.size() > TARGET_SIZE) {
             similarProducts = similarProducts.stream()
                     .filter((currProduct) ->
                             (currProduct.getProductPrice() < maxPrice &&
@@ -131,8 +159,12 @@ public class ProductServiceImpl implements IProductService {
                 productFinalDto -> productRepository.existsById(productFinalDto.getProductId())
         ).toList();
         if (productExistsList.size() == productFinalDtoList.size()) {
-            List<ProductDto> productDtoList = productFinalDtoList.
-                    stream().map(ProductMapper::mapToProductDto).toList();
+            List<ProductDto> productDtoList = productFinalDtoList.stream()
+                    .map(productDto -> {
+                        ProductDto updatedProduct = ProductMapper.mapToProductDto(productDto);
+                        updatedProduct.setDateModified(LocalDateTime.now());
+                        return updatedProduct;
+                    }).toList();
             return validateAndSaveOrUpdateProduct(productDtoList);
         }
         return Constants.ProductNotFound;

@@ -22,7 +22,7 @@ public class SubCategoryController {
         return new ResponseEntity<>(subCategories, HttpStatus.OK);
     }
 
-    @GetMapping("/{categoryId}")
+    @GetMapping("/getByCategoryId/{categoryId}")
     public ResponseEntity<List<SubCategoryDto>> getSubCategoriesByCategoryId(
             @PathVariable("categoryId") Integer categoryId) {
         List<SubCategoryDto> subCategories = subCategoryService.getSubCategoriesByCategoryId(categoryId);
@@ -30,13 +30,13 @@ public class SubCategoryController {
     }
 
     @GetMapping("/{subCategoryId}")
-    public ResponseEntity<SubCategoryDto> getSubCategoryById(@PathVariable Integer subCategoryId) {
+    public ResponseEntity<SubCategoryDto> getSubCategoryById(@PathVariable("subCategoryId") Integer subCategoryId) {
         SubCategoryDto subCategory = subCategoryService.getSubCategoryById(subCategoryId);
         return new ResponseEntity<>(subCategory, HttpStatus.OK);
     }
 
-    @GetMapping("/getAllByNames/{subCategoryName}")
-    public ResponseEntity<List<SubCategoryDto>> getAllSubCategoriesByName(@PathVariable String subCategoryName) {
+    @GetMapping("/getAllBySubCategoryName/{subCategoryName}")
+    public ResponseEntity<List<SubCategoryDto>> getAllSubCategoriesByName(@PathVariable("subCategoryName") String subCategoryName) {
         List<SubCategoryDto> subCategories = subCategoryService.getAllSubCategoriesByName(subCategoryName);
         return new ResponseEntity<>(subCategories, HttpStatus.OK);
     }
