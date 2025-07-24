@@ -1,6 +1,5 @@
 package com.ecs.ecs_product.repository;
 
-import com.ecs.ecs_product.entity.Product;
 import com.ecs.ecs_product.entity.SubCategory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
