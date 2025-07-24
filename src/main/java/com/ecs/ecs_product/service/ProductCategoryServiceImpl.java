@@ -8,6 +8,8 @@ import com.ecs.ecs_product.repository.ProductCategoryRepository;
 import com.ecs.ecs_product.repository.ProductRepository;
 import com.ecs.ecs_product.service.interfaces.IProductCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -36,8 +38,14 @@ public class ProductCategoryServiceImpl implements IProductCategoryService {
     }
 
     @Override
+    public Page<ProductCategoryDto> getAllCategoriesWithPagination(Pageable page, String searchValue) {
+        return productCategoryRepository.
+                findFilteredProductCategories(page, searchValue).map(ProductCategoryMapper::mapToProductCategoryDto);
+    }
+
+    @Override
     public ProductCategoryDto addProductCategory(ProductCategoryDto productCategoryDto) {
-        if (!productCategoryRepository.existsById(productCategoryDto.getCategoryId())) {
+        if (productCategoryDto.getCategoryId()==null || !productCategoryRepository.existsById(productCategoryDto.getCategoryId())) {
             ProductCategory productCategory = ProductCategoryMapper.mapToProductCategory(productCategoryDto);
             ProductCategory newProductCategory = productCategoryRepository.save(productCategory);
             return ProductCategoryMapper.mapToProductCategoryDto(newProductCategory);
@@ -52,7 +60,7 @@ public class ProductCategoryServiceImpl implements IProductCategoryService {
                 orElse(null);
         if (Objects.nonNull(productCategory)) {
             productCategory.setProductCategoryName(productCategoryDto.getCategoryName());
-            ProductCategory updatedProductCategory = productCategoryRepository.save(productCategory);
+            ProductCategory updatedProductCategory = productCategoryRepository.save(ProductCategoryMapper.mapToProductCategory(productCategoryDto));
             return ProductCategoryMapper.mapToProductCategoryDto(updatedProductCategory);
         } else {
             return null;

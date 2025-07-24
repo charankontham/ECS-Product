@@ -3,6 +3,9 @@ package com.ecs.ecs_product.controller;
 import com.ecs.ecs_product.dto.ProductBrandDto;
 import com.ecs.ecs_product.service.interfaces.IProductBrandService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +28,17 @@ public class ProductBrandController {
     @GetMapping("/")
     public ResponseEntity<List<ProductBrandDto>> getAllProductBrands() {
         List<ProductBrandDto> productBrands = productBrandService.getAllProductBrands();
+        return ResponseEntity.ok(productBrands);
+    }
+
+    @GetMapping("/getAllBrandsByPagination")
+    public ResponseEntity<Page<ProductBrandDto>> getAllProductBrandsByPagination(
+            @RequestParam(defaultValue = "0", name = "currentPage") Integer pageNumber,
+            @RequestParam(defaultValue = "10", name = "offset") Integer itemSize,
+            @RequestParam(required = false, name="searchValue") String searchValue
+    ) {
+        Pageable pageable = PageRequest.of(pageNumber, itemSize);
+        Page<ProductBrandDto> productBrands = productBrandService.getAllProductBrandsWithPagination(pageable, searchValue);
         return ResponseEntity.ok(productBrands);
     }
 

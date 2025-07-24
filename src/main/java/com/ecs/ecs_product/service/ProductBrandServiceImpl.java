@@ -8,6 +8,8 @@ import com.ecs.ecs_product.repository.ProductBrandRepository;
 import com.ecs.ecs_product.service.interfaces.IProductBrandService;
 import com.ecs.ecs_product.validations.BasicValidation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +33,11 @@ public class ProductBrandServiceImpl implements IProductBrandService {
         List<ProductBrand> productBrands = productBrandRepository.findAll();
         return productBrands.stream().map(ProductBrandMapper::mapToProductBrandDto).
                 collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<ProductBrandDto> getAllProductBrandsWithPagination(Pageable pageable, String searchValue) {
+        return productBrandRepository.findFilteredProductBrands(pageable, searchValue).map(ProductBrandMapper::mapToProductBrandDto);
     }
 
     @Override

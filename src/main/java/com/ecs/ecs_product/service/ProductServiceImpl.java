@@ -2,6 +2,7 @@ package com.ecs.ecs_product.service;
 
 import com.ecs.ecs_product.dto.ProductDto;
 import com.ecs.ecs_product.dto.ProductFinalDto;
+import com.ecs.ecs_product.dto.ProductImageUpdate;
 import com.ecs.ecs_product.entity.Product;
 import com.ecs.ecs_product.exception.ResourceNotFoundException;
 import com.ecs.ecs_product.mapper.ProductMapper;
@@ -67,6 +68,17 @@ public class ProductServiceImpl implements IProductService {
                                 product,
                                 subCategoryService,
                                 productBrandService));
+    }
+
+    @Override
+    public Page<ProductFinalDto> getAllOutOfStockProducts(Pageable pageable) {
+        return productRepository.findAllOutOfStockProducts(pageable)
+                .map((product ->
+                        ProductMapper.mapToProductFinalDto(
+                                product,
+                                subCategoryService,
+                                productBrandService))
+                );
     }
 
     @Override
@@ -145,7 +157,7 @@ public class ProductServiceImpl implements IProductService {
     @Override
     public Object addProduct(ProductDto productDto) {
         boolean productIdExists = Objects.nonNull(productDto.getProductId());
-        if (productIdExists) {
+        if (productIdExists && productDto.getProductId() != 0) {
             if (productRepository.existsById(productDto.getProductId())) {
                 return HttpStatus.CONFLICT;
             }

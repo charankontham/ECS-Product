@@ -3,6 +3,9 @@ package com.ecs.ecs_product.controller;
 import com.ecs.ecs_product.dto.ProductCategoryDto;
 import com.ecs.ecs_product.service.interfaces.IProductCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +31,17 @@ public class ProductCategoryController {
         return ResponseEntity.ok(productCategories);
     }
 
+    @GetMapping("/getAllCategoriesByPagination")
+    public ResponseEntity<Page<ProductCategoryDto>> getAllCategoriesByPagination(
+            @RequestParam(defaultValue = "0", name = "currentPage") Integer pageNumber,
+            @RequestParam(defaultValue = "10", name = "offset") Integer itemSize,
+            @RequestParam(required = false, name="searchValue") String searchValue
+    ) {
+        Pageable pageable = PageRequest.of(pageNumber, itemSize);
+        Page<ProductCategoryDto> productCategories = productCategoryService.getAllCategoriesWithPagination(pageable, searchValue);
+        return ResponseEntity.ok(productCategories);
+    }
+
     @PostMapping
     public ResponseEntity<?> addProductCategory(@RequestBody ProductCategoryDto productCategoryDto) {
         ProductCategoryDto newProductCategoryDto = productCategoryService.addProductCategory(productCategoryDto);
@@ -43,7 +57,7 @@ public class ProductCategoryController {
         if (!Objects.nonNull(newProductCategoryDto)) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("CategoryId not found!");
         }
-        return new ResponseEntity<>(newProductCategoryDto, HttpStatus.CREATED);
+        return new ResponseEntity<>(newProductCategoryDto, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

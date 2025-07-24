@@ -25,4 +25,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
                                        @Param("subCategoryId") Integer subCategoryId,
                                        @Param("brandId") Integer brandId,
                                        @Param("searchValue") String searchValue);
+
+    @Query("SELECT p FROM Product p WHERE p.productQuantity = 0 ORDER BY p.productName" )
+    Page<Product> findAllOutOfStockProducts(Pageable pageable);
 }

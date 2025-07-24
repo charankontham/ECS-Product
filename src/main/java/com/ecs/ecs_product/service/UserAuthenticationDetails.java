@@ -34,11 +34,10 @@ public class UserAuthenticationDetails implements UserDetailsService {
                 return new UserPrincipal(customerResponse.getBody());
             }
         }catch(FeignException.Unauthorized ex){
-            System.out.println("Customer not found, Now checking admin...");
-        }
-        ResponseEntity<AdminDto> adminResponse = adminService.getByUsername(username);
-        if(Objects.nonNull(adminResponse.getBody()) || adminResponse.getStatusCode() == HttpStatus.OK){
-            return new UserPrincipal(adminResponse.getBody());
+            ResponseEntity<AdminDto> adminResponse = adminService.getByUsername(username);
+            if(Objects.nonNull(adminResponse.getBody()) || adminResponse.getStatusCode() == HttpStatus.OK){
+                return new UserPrincipal(adminResponse.getBody());
+            }
         }
         throw new ResourceNotFoundException("User not found");
     }

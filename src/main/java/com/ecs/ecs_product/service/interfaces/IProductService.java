@@ -2,6 +2,7 @@ package com.ecs.ecs_product.service.interfaces;
 
 import com.ecs.ecs_product.dto.ProductDto;
 import com.ecs.ecs_product.dto.ProductFinalDto;
+import com.ecs.ecs_product.dto.ProductImageUpdate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,8 @@ public interface IProductService {
             Integer subCategoryId,
             Integer brandId,
             String searchValue);
+
+    Page<ProductFinalDto> getAllOutOfStockProducts(Pageable pageable);
 
     List<ProductFinalDto> getProductsByCategoryId(Integer categoryId);
 

@@ -12,6 +12,8 @@ import com.ecs.ecs_product.service.interfaces.ISubCategoryService;
 import com.ecs.ecs_product.util.Constants;
 import com.ecs.ecs_product.validations.BasicValidation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +40,12 @@ public class SubCategoryServiceImpl implements ISubCategoryService {
     }
 
     @Override
+    public Page<SubCategoryDto> getAllSubCategoriesWithPagination(Pageable pageable, Integer categoryId, String searchValue) {
+        return subCategoryRepository.findFilteredSubCategories(pageable, categoryId, searchValue).
+                map(SubCategoryMapper::mapToSubCategoryDto);
+    }
+
+    @Override
     public SubCategoryDto getSubCategoryById(Integer subCategoryId) {
         SubCategory subCategory = subCategoryRepository.findById(subCategoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("SubCategory not found!"));
@@ -61,34 +69,26 @@ public class SubCategoryServiceImpl implements ISubCategoryService {
 
     @Override
     public Object addSubCategory(SubCategoryDto subCategoryDto) {
-        boolean subCategoryExists = subCategoryRepository.existsById(subCategoryDto.getCategoryId());
-        if (subCategoryExists) {
+        if (subCategoryDto.getSubCategoryId() !=null && subCategoryRepository.existsById(subCategoryDto.getSubCategoryId())) {
             return HttpStatus.CONFLICT;
-        } else {
-            if (
-                    subCategoryDto.getCategoryId() != null &&
-                            BasicValidation.stringValidation(subCategoryDto.getSubCategoryName())
-            ) {
+        } else if(BasicValidation.stringValidation(subCategoryDto.getSubCategoryName())){
                 SubCategory savedSubCategory = subCategoryRepository.save(SubCategoryMapper.mapToSubCategory(subCategoryDto));
                 return SubCategoryMapper.mapToSubCategoryDto(savedSubCategory);
-            } else {
-                return HttpStatus.BAD_REQUEST;
-            }
+        } else {
+            return HttpStatus.BAD_REQUEST;
         }
     }
 
     @Override
     public Object updateSubCategory(SubCategoryDto subCategoryDto) {
-        boolean subCategoryExists = subCategoryRepository.existsById(subCategoryDto.getCategoryId());
-        if(subCategoryExists) {
-            if(BasicValidation.stringValidation(subCategoryDto.getSubCategoryName())){
-                SubCategory updatedSubCategory = subCategoryRepository.save(SubCategoryMapper.mapToSubCategory(subCategoryDto));
-                return SubCategoryMapper.mapToSubCategoryDto(updatedSubCategory);
-            }else{
-                return HttpStatus.BAD_REQUEST;
-            }
-        }else{
+        boolean subCategoryExists = subCategoryRepository.existsById(subCategoryDto.getSubCategoryId());
+        if(!subCategoryExists) {
             return Constants.SubCategoryNotFound;
+        }else if(BasicValidation.stringValidation(subCategoryDto.getSubCategoryName())){
+            SubCategory updatedSubCategory = subCategoryRepository.save(SubCategoryMapper.mapToSubCategory(subCategoryDto));
+            return SubCategoryMapper.mapToSubCategoryDto(updatedSubCategory);
+        } else{
+            return HttpStatus.BAD_REQUEST;
         }
     }
 

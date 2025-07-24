@@ -44,6 +44,15 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
+    @GetMapping("/getAllOutOfStockProductsByPagination")
+    public ResponseEntity<Page<ProductFinalDto>> getAllOutOfStockProducts(
+            @RequestParam(defaultValue = "0", name="currentPage") Integer pageNumber,
+            @RequestParam(defaultValue = "5", name = "offset") Integer offset
+    ){
+        Pageable pageable = PageRequest.of(pageNumber, offset);
+        Page<ProductFinalDto> products = productService.getAllOutOfStockProducts(pageable);
+        return ResponseEntity.ok(products);
+    }
     @GetMapping("/getProductsByCategoryId/{id}")
     public ResponseEntity<List<ProductFinalDto>> getAllProductsByCategoryId(@PathVariable("id") Integer categoryId) {
         List<ProductFinalDto> products = productService.getProductsByCategoryId(categoryId);
@@ -65,8 +74,8 @@ public class ProductController {
     @PostMapping
     public ResponseEntity<?> addProduct(@RequestBody ProductDto productDto) {
         Object response = productService.addProduct(productDto);
-        if(response instanceof ProductFinalDto) {
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        if(response instanceof List && !((List<?>) response).isEmpty()) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(((List<?>)response).get(0));
         }
         return HelperFunctions.getResponseEntity(response);
     }
