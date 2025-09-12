@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -162,6 +163,8 @@ public class ProductServiceImpl implements IProductService {
                 return HttpStatus.CONFLICT;
             }
         }
+        productDto.setDateAdded(LocalDateTime.now(ZoneId.of("UTC")));
+        productDto.setDateModified(LocalDateTime.now(ZoneId.of("UTC")));
         return validateAndSaveOrUpdateProduct(List.of(productDto));
     }
 
@@ -174,7 +177,7 @@ public class ProductServiceImpl implements IProductService {
             List<ProductDto> productDtoList = productFinalDtoList.stream()
                     .map(productDto -> {
                         ProductDto updatedProduct = ProductMapper.mapToProductDto(productDto);
-                        updatedProduct.setDateModified(LocalDateTime.now());
+                        updatedProduct.setDateModified(LocalDateTime.now(ZoneId.of("UTC")));
                         return updatedProduct;
                     }).toList();
             return validateAndSaveOrUpdateProduct(productDtoList);

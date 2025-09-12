@@ -2,6 +2,7 @@ package com.ecs.ecs_product.config;
 
 import feign.RequestInterceptor;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -10,6 +11,9 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Configuration
 public class FeignClientConfig {
+
+    @Autowired
+    ServiceToServiceAuthentication serviceAuthentication;
 
     @Bean
     public RequestInterceptor requestInterceptor() {
@@ -22,6 +26,9 @@ public class FeignClientConfig {
                     requestTemplate.header(HttpHeaders.AUTHORIZATION, authorizationHeader);
                 }
             }
+
+            String serviceToken = serviceAuthentication.getToken();
+            requestTemplate.header(HttpHeaders.AUTHORIZATION, "Bearer " + serviceToken);
         };
     }
 }

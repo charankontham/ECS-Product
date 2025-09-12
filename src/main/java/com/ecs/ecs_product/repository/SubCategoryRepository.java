@@ -13,7 +13,6 @@ public interface SubCategoryRepository extends JpaRepository<SubCategory, Intege
     List<SubCategory> findAllByCategoryId(Integer categoryId);
     List<SubCategory> findAllBySubCategoryName(String subCategoryName);
 
-
     @Query("""
             SELECT sc FROM SubCategory sc WHERE
             ( sc.subCategoryId <> 55 AND (:categoryId IS NULL OR sc.categoryId = :categoryId)) AND

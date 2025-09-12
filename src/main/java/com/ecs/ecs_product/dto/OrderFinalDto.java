@@ -17,13 +17,13 @@ public class OrderFinalDto {
     private Integer orderId;
     private CustomerDto customer;
     private AddressDto shippingAddress;
-    private List<ProductFinalDto> products;
+    private List<OrderItemEnriched> orderItems;
     private Float itemsSubTotal;
+    private Float shippingFee;
     private Float totalTax;
     private Float totalOrderValue;
     private LocalDateTime orderDate;
-    private LocalDateTime deliveryDate;
-    private String shippingStatus;
-    private String paymentType;
-    private String paymentStatus;
+    private Integer orderStatus;
+    private Integer paymentType;
+    private Integer paymentStatus;
 }
