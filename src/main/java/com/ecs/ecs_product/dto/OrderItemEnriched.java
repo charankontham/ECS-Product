@@ -10,6 +10,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrderItemEnriched {
+    private Integer orderItemId;
+    private Integer orderId;
     private ProductFinalDto product;
     private Integer orderItemStatus;
+    private Integer invoiceId;
 }

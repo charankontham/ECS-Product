@@ -26,4 +26,5 @@ public class OrderFinalDto {
     private Integer orderStatus;
     private Integer paymentType;
     private Integer paymentStatus;
+    private Integer invoiceId;
 }

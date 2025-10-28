@@ -22,4 +22,5 @@ public class OrderDto {
     private Float shippingFee;
     private LocalDateTime orderDate;
     private Integer orderStatus;
+    private Integer invoiceId;
 }
