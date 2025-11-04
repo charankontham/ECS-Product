@@ -19,7 +19,8 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
             + "(:categoryId IS NULL OR p.productCategoryId = :categoryId) AND "
             + "(:subCategoryId IS NULL OR p.subCategoryId = :subCategoryId) AND "
             + "(:brandId IS NULL OR p.productBrandId = :brandId) AND "
-            + "(:searchValue IS NULL OR LOWER(p.productName) LIKE LOWER(CONCAT('%', :searchValue, '%')))")
+            + "(:searchValue IS NULL OR LOWER(p.productName) LIKE LOWER(CONCAT('%', :searchValue, '%')))"
+            + "ORDER BY p.dateAdded DESC")
     Page<Product> findFilteredProducts(Pageable pageable,
                                        @Param("categoryId") Integer categoryId,
                                        @Param("subCategoryId") Integer subCategoryId,

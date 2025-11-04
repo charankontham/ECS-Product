@@ -14,6 +14,7 @@ public interface ProductCategoryRepository extends JpaRepository<ProductCategory
             + "pc.categoryId <> 24 AND "
             + "(:searchValue IS NULL OR "
             + "LOWER(pc.productCategoryName) LIKE LOWER(CONCAT('%', :searchValue, '%')) OR "
-            + "STR(pc.categoryId) = :searchValue )")
+            + "STR(pc.categoryId) = :searchValue )"
+            + "ORDER BY pc.categoryId DESC")
     Page<ProductCategory> findFilteredProductCategories(Pageable pageable, @Param("searchValue") String searchValue);
 }

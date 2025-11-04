@@ -19,6 +19,7 @@ public interface SubCategoryRepository extends JpaRepository<SubCategory, Intege
             ( :searchValue IS NULL OR LOWER(sc.subCategoryName) LIKE LOWER(CONCAT('%', :searchValue, '%')) OR
             LOWER(sc.subCategoryDescription) LIKE LOWER(CONCAT('%', :searchValue, '%')) OR
             STR(sc.subCategoryId) = :searchValue )
+            ORDER BY sc.categoryId DESC
     """)
     Page<SubCategory> findFilteredSubCategories(Pageable pageable,
                                        @Param("categoryId") Integer categoryId,

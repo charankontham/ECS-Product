@@ -15,6 +15,7 @@ public interface ProductBrandRepository extends JpaRepository<ProductBrand, Inte
             + "(:searchValue IS NULL OR "
             + "LOWER(pb.brandName) LIKE LOWER(CONCAT('%', :searchValue, '%')) OR "
             + "LOWER(pb.brandDescription) LIKE LOWER(CONCAT('%', :searchValue, '%')) OR "
-            + "STR(pb.brandId) = :searchValue )")
+            + "STR(pb.brandId) = :searchValue )"
+            + "ORDER BY pb.brandId DESC")
     Page<ProductBrand> findFilteredProductBrands(Pageable pageable, @Param("searchValue") String searchValue);
 }
