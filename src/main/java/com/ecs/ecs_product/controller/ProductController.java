@@ -4,6 +4,7 @@ import com.ecs.ecs_product.dto.ProductDto;
 import com.ecs.ecs_product.dto.ProductFinalDto;
 import com.ecs.ecs_product.service.interfaces.IProductService;
 import com.ecs.ecs_product.util.HelperFunctions;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,9 +16,9 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/product")
+@RequiredArgsConstructor(onConstructor_ = {@Autowired})
 public class ProductController {
-    @Autowired
-    private IProductService productService;
+    private final IProductService productService;
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductFinalDto> getProductById(@PathVariable("id") Integer productId) {

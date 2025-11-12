@@ -61,7 +61,8 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         List<String> ALLOWED_PATHS = List.of(
-                "/api/product/**"
+                "/api/product/**",
+                "/api/search/**"
         );
         AntPathMatcher pathMatcher = new AntPathMatcher();
         String requestPath = request.getServletPath();

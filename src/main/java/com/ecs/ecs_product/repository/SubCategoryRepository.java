@@ -24,5 +24,24 @@ public interface SubCategoryRepository extends JpaRepository<SubCategory, Intege
     Page<SubCategory> findFilteredSubCategories(Pageable pageable,
                                        @Param("categoryId") Integer categoryId,
                                        @Param("searchValue") String searchValue);
+
+    @Query(value = """
+        SELECT sc.*,
+        (
+            (MATCH(sc.sub_category_name) AGAINST (:keyword IN BOOLEAN MODE)) * 4 +
+            (CASE
+                WHEN LOWER(sc.sub_category_name) = LOWER(:keyword) THEN 3
+                WHEN LOWER(sc.sub_category_name) LIKE LOWER(CONCAT(:keyword, '%')) THEN 2
+                WHEN LOWER(sc.sub_category_name) LIKE LOWER(CONCAT('%', :keyword, '%')) THEN 1
+                ELSE 0
+             END)
+        ) AS relevance
+        FROM sub_category sc
+        WHERE MATCH(sc.sub_category_name) AGAINST (:keyword IN BOOLEAN MODE)
+           OR LOWER(sc.sub_category_name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+        ORDER BY relevance DESC
+        LIMIT 5
+        """, nativeQuery = true)
+    List<SubCategory> searchTop2Subcategories(@Param("keyword") String keyword);
 }
 

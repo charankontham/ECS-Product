@@ -3,6 +3,7 @@ package com.ecs.ecs_product.service.interfaces;
 import com.ecs.ecs_product.dto.ProductDto;
 import com.ecs.ecs_product.dto.ProductFinalDto;
 import com.ecs.ecs_product.dto.ProductImageUpdate;
+import com.ecs.ecs_product.dto.SearchResultDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -29,6 +30,8 @@ public interface IProductService {
     List<ProductFinalDto> getProductsByBrandId(Integer brandId);
 
     List<ProductDto> getSimilarProductsById(Integer productId);
+
+    List<SearchResultDto> getSearchSuggestions(String searchValue);
 
     Object addProduct(ProductDto productDto);
 

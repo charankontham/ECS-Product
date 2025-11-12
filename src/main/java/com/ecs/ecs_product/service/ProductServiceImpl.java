@@ -3,13 +3,18 @@ package com.ecs.ecs_product.service;
 import com.ecs.ecs_product.dto.ProductDto;
 import com.ecs.ecs_product.dto.ProductFinalDto;
 import com.ecs.ecs_product.dto.ProductImageUpdate;
+import com.ecs.ecs_product.dto.SearchResultDto;
 import com.ecs.ecs_product.entity.Product;
+import com.ecs.ecs_product.entity.ProductBrand;
+import com.ecs.ecs_product.entity.ProductCategory;
+import com.ecs.ecs_product.entity.SubCategory;
 import com.ecs.ecs_product.exception.ResourceNotFoundException;
 import com.ecs.ecs_product.mapper.ProductMapper;
-import com.ecs.ecs_product.repository.ProductRepository;
+import com.ecs.ecs_product.repository.*;
 import com.ecs.ecs_product.service.interfaces.*;
 import com.ecs.ecs_product.util.Constants;
 import com.ecs.ecs_product.util.HelperFunctions;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -19,25 +24,20 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
 @Service
+@RequiredArgsConstructor(onConstructor_ = {@Autowired})
 public class ProductServiceImpl implements IProductService {
-    @Autowired
-    private ProductRepository productRepository;
-    @Autowired
-    private IProductCategoryService productCategoryService;
-    @Autowired
-    private ISubCategoryService subCategoryService;
-    @Autowired
-    private IProductBrandService productBrandService;
-    @Autowired
-    private CheckDependencies checkDependencies;
+    private final ProductRepository productRepository;
+    private final IProductCategoryService productCategoryService;
+    private final ISubCategoryService subCategoryService;
+    private final IProductBrandService productBrandService;
+    private final CheckDependencies checkDependencies;
+    private final GlobalSearchDao globalSearchDao;
 
     @Override
     public ProductFinalDto getProduct(Integer productId) {
@@ -50,10 +50,10 @@ public class ProductServiceImpl implements IProductService {
     public List<ProductFinalDto> getAllProducts() {
         List<Product> products = productRepository.findAll();
         return products.stream().map((product) -> ProductMapper.
-                        mapToProductFinalDto(
-                                product,
-                                subCategoryService,
-                                productBrandService)).toList();
+                mapToProductFinalDto(
+                        product,
+                        subCategoryService,
+                        productBrandService)).toList();
     }
 
     @Override
@@ -86,20 +86,20 @@ public class ProductServiceImpl implements IProductService {
     public List<ProductFinalDto> getProductsByCategoryId(Integer categoryId) {
         List<Product> products = productRepository.getProductsByProductCategoryId(categoryId);
         return products.stream().map((product) -> ProductMapper.
-                        mapToProductFinalDto(
-                                product,
-                                subCategoryService,
-                                productBrandService)).toList();
+                mapToProductFinalDto(
+                        product,
+                        subCategoryService,
+                        productBrandService)).toList();
     }
 
     @Override
     public List<ProductFinalDto> getProductsByBrandId(Integer brandId) {
         List<Product> products = productRepository.getProductsByProductBrandId(brandId);
         return products.stream().map((product) -> ProductMapper.
-                        mapToProductFinalDto(
-                                product,
-                                subCategoryService,
-                                productBrandService)).toList();
+                mapToProductFinalDto(
+                        product,
+                        subCategoryService,
+                        productBrandService)).toList();
     }
 
     @Override
@@ -153,6 +153,32 @@ public class ProductServiceImpl implements IProductService {
         return similarProducts.stream().map(ProductMapper::mapToProductDto).
                 toList().
                 subList(0, Math.min(similarProducts.size(), 10));
+    }
+
+    @Override
+    public List<SearchResultDto> getSearchSuggestions(String searchValue) {
+        List<SearchResultDto> finalResults = new ArrayList<>();
+        finalResults.addAll(globalSearchDao.globalSearch(searchValue, "products"));
+        finalResults.addAll(globalSearchDao.globalSearch(searchValue, "categories"));
+        finalResults.addAll(globalSearchDao.globalSearch(searchValue, "subcategories"));
+        finalResults.addAll(globalSearchDao.globalSearch(searchValue, "brands"));
+        for (SearchResultDto dto : finalResults) {
+            double score = dto.getRelevanceScore();
+            switch (dto.getItemType().toUpperCase()) {
+                case "PRODUCT":
+                    score *= 1.0;
+                    break;
+                case "CATEGORY":
+                    score *= 0.8;
+                    break;
+                case "SUBCATEGORY", "BRAND":
+                    score *= 0.9;
+                    break;
+            }
+            dto.setRelevanceScore(score);
+        }
+        finalResults.sort(Comparator.comparingDouble(SearchResultDto::getRelevanceScore).reversed());
+        return finalResults.stream().limit(10).toList();
     }
 
     @Override
