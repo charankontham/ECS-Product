@@ -33,6 +33,15 @@ public class SubCategoryServiceImpl implements ISubCategoryService {
     }
 
     @Override
+    public List<SubCategoryEnriched> getAllSubCategoriesEnriched() {
+        return subCategoryRepository.findAll().stream()
+                .map(subCategory -> SubCategoryMapper.mapToEnrichedSubCategoryDto(
+                        subCategory,
+                        productCategoryService.getProductCategoryById(subCategory.getCategoryId())
+                )).toList();
+    }
+
+    @Override
     public List<SubCategoryDto> getSubCategoriesByCategoryId(Integer categoryId) {
         return subCategoryRepository.findAllByCategoryId(categoryId)
                 .stream().map(SubCategoryMapper::mapToSubCategoryDto)

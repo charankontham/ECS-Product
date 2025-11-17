@@ -10,6 +10,7 @@ import java.util.List;
 
 public interface ISubCategoryService {
     List<SubCategoryDto> getAllSubCategories();
+    List<SubCategoryEnriched> getAllSubCategoriesEnriched();
     List<SubCategoryDto> getSubCategoriesByCategoryId(Integer categoryId);
     Page<SubCategoryDto> getAllSubCategoriesWithPagination(Pageable pageable, Integer categoryId, String searchValue);
     SubCategoryDto getSubCategoryById(Integer subCategoryId);

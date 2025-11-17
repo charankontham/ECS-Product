@@ -1,6 +1,7 @@
 package com.ecs.ecs_product.controller;
 
 import com.ecs.ecs_product.dto.SubCategoryDto;
+import com.ecs.ecs_product.dto.SubCategoryEnriched;
 import com.ecs.ecs_product.service.interfaces.ISubCategoryService;
 import com.ecs.ecs_product.util.HelperFunctions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,12 @@ public class SubCategoryController {
     @GetMapping("/")
     public ResponseEntity<List<SubCategoryDto>> getAllSubCategories() {
         List<SubCategoryDto> subCategories = subCategoryService.getAllSubCategories();
+        return new ResponseEntity<>(subCategories, HttpStatus.OK);
+    }
+
+    @GetMapping("/getEnrichedSubCategories")
+    public ResponseEntity<List<SubCategoryEnriched>> getAllSubCategoriesEnriched() {
+        List<SubCategoryEnriched> subCategories = subCategoryService.getAllSubCategoriesEnriched();
         return new ResponseEntity<>(subCategories, HttpStatus.OK);
     }
 

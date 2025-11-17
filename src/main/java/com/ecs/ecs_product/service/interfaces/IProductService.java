@@ -1,9 +1,6 @@
 package com.ecs.ecs_product.service.interfaces;
 
-import com.ecs.ecs_product.dto.ProductDto;
-import com.ecs.ecs_product.dto.ProductFinalDto;
-import com.ecs.ecs_product.dto.ProductImageUpdate;
-import com.ecs.ecs_product.dto.SearchResultDto;
+import com.ecs.ecs_product.dto.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -38,4 +35,6 @@ public interface IProductService {
     Object updateProducts(List<ProductFinalDto> productFinalDtoList);
 
     HttpStatus deleteProduct(Integer productId);
+
+    Page<ProductFinalDto> globalSearchProducts(SearchFilters searchFilters, Pageable pageable);
 }

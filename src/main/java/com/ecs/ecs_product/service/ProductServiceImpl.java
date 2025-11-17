@@ -1,14 +1,12 @@
 package com.ecs.ecs_product.service;
 
-import com.ecs.ecs_product.dto.ProductDto;
-import com.ecs.ecs_product.dto.ProductFinalDto;
-import com.ecs.ecs_product.dto.ProductImageUpdate;
-import com.ecs.ecs_product.dto.SearchResultDto;
+import com.ecs.ecs_product.dto.*;
 import com.ecs.ecs_product.entity.Product;
 import com.ecs.ecs_product.entity.ProductBrand;
 import com.ecs.ecs_product.entity.ProductCategory;
 import com.ecs.ecs_product.entity.SubCategory;
 import com.ecs.ecs_product.exception.ResourceNotFoundException;
+import com.ecs.ecs_product.feign.ProductReviewService;
 import com.ecs.ecs_product.mapper.ProductMapper;
 import com.ecs.ecs_product.repository.*;
 import com.ecs.ecs_product.service.interfaces.*;
@@ -18,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -38,6 +37,7 @@ public class ProductServiceImpl implements IProductService {
     private final IProductBrandService productBrandService;
     private final CheckDependencies checkDependencies;
     private final GlobalSearchDao globalSearchDao;
+    private final ProductReviewService productReviewService;
 
     @Override
     public ProductFinalDto getProduct(Integer productId) {
@@ -221,6 +221,50 @@ public class ProductServiceImpl implements IProductService {
             return HttpStatus.CONFLICT;
         }
         return HttpStatus.NOT_FOUND;
+    }
+
+    @Override
+    public Page<ProductFinalDto> globalSearchProducts(SearchFilters searchFilters, Pageable pageable) {
+        List<ProductWithRelevanceProjection> products = productRepository.globalSearchProducts(searchFilters.getKeyword());
+        List<ProductWithRelevanceProjection> filteredProducts = new ArrayList<>(products.stream()
+                .filter(p -> searchFilters.getCategories() == null || searchFilters.getCategories().isEmpty() || searchFilters.getCategories().contains(p.getSubCategoryId()))
+                .filter(p -> searchFilters.getSubCategories() == null || searchFilters.getSubCategories().isEmpty() || searchFilters.getSubCategories().contains(p.getSubCategoryId()))
+                .filter(p -> searchFilters.getBrands() == null || searchFilters.getBrands().isEmpty() || searchFilters.getBrands().contains(p.getProductBrandId()))
+                .filter(p -> searchFilters.getPriceRange() == null ||
+                        (p.getProductPrice() >= searchFilters.getPriceRange().get(0) && p.getProductPrice() <= searchFilters.getPriceRange().get(1)))
+                .filter(p -> searchFilters.getMinRating() == null || getProductAvgReview(p.getProductId()) >= searchFilters.getMinRating())
+                .filter(p -> searchFilters.getColors() == null || searchFilters.getColors().isEmpty() ||
+                        searchFilters.getColors().stream().anyMatch(color -> color.equalsIgnoreCase(p.getProductColor())))
+                .filter(p -> searchFilters.getCondition() == null || searchFilters.getCondition().isEmpty() ||
+                        searchFilters.getCondition().stream().anyMatch(condition -> condition.equalsIgnoreCase(p.getProductCondition())))
+//                .filter(p -> minDiscount == null || p.getProduct().getDiscount() >= minDiscount)
+                .toList());
+        if ("relevance".equalsIgnoreCase(searchFilters.getSortBy())) {
+            filteredProducts.sort(Comparator.comparing(ProductWithRelevanceProjection::getRelevance).reversed());
+        } else if ("low-to-high".equalsIgnoreCase(searchFilters.getSortBy())) {
+            filteredProducts.sort(Comparator.comparing(ProductWithRelevanceProjection::getProductPrice));
+        } else if ("high-to-low".equalsIgnoreCase(searchFilters.getSortBy())) {
+            filteredProducts.sort(Comparator.comparing(ProductWithRelevanceProjection::getProductPrice, Comparator.reverseOrder()));
+        }
+//        else if ("rating".equalsIgnoreCase(searchFilters.getSortBy())) {
+//            filteredProducts.sort(Comparator.comparing(p -> p.getRating(), Comparator.reverseOrder()));
+//        }
+
+        int start = pageable.getPageNumber() * pageable.getPageSize();
+        int end = Math.min(start + pageable.getPageSize(), products.size());
+        List<ProductWithRelevanceProjection> paginatedProducts = start <= end ? filteredProducts.subList(start, end) : new ArrayList<>();
+        List<ProductFinalDto> pageContent = paginatedProducts.stream()
+                .map(p -> ProductMapper.mapToProductFinalDto(p, subCategoryService, productBrandService)).toList();
+        return new PageImpl<>(pageContent, PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()), products.size());
+    }
+
+    private Float getProductAvgReview(Integer productId) {
+        List<ProductReviewDto> result = productReviewService.getProductReviewsByProductId(productId).getBody();
+        assert result != null;
+        if(result.isEmpty()){
+            return 0f;
+        }
+        return (float) (result.stream().mapToInt(ProductReviewDto::getProductRating).sum() / result.size());
     }
 
     private Object validateAndSaveOrUpdateProduct(List<ProductDto> productDtoList) {

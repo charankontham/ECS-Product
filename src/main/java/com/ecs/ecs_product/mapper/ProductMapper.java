@@ -73,6 +73,31 @@ public class ProductMapper {
         );
     }
 
+    public static ProductFinalDto mapToProductFinalDto(
+            ProductWithRelevanceProjection product,
+            ISubCategoryService subCategoryService,
+            IProductBrandService productBrandService
+    ) {
+        SubCategoryEnriched subCategory = subCategoryService.getEnrichedSubCategoryById(product.getSubCategoryId());
+        ProductBrandDto productBrandDto = productBrandService.getProductBrandById(product.getProductBrandId());
+        return new ProductFinalDto(
+                product.getProductId(),
+                product.getProductName(),
+                productBrandDto,
+                subCategory,
+                product.getProductDescription(),
+                product.getProductPrice(),
+                product.getProductQuantity(),
+                product.getProductImage(),
+                product.getProductColor(),
+                product.getProductWeight(),
+                product.getDateAdded(),
+                product.getDateModified(),
+                product.getProductDimensions(),
+                product.getProductCondition()
+        );
+    }
+
     public static ProductDto mapToProductDto(ProductFinalDto productFinalDto) {
         return new ProductDto(
                 productFinalDto.getProductId(),
