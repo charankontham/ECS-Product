@@ -1,18 +1,17 @@
-Here is the SQL SP script for globa search:
+Here is the SQL SP script for global search:
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `globalSearch`(
-    IN search_keyword VARCHAR(255)
-)
-    COMMENT 'Powerful search with synonym and fuzzy matching'
-BEGIN
+	CREATE DEFINER=`root`@`localhost` PROCEDURE `globalSearch`(
+    	IN search_keyword VARCHAR(255)
+	)
+	COMMENT 'Powerful search with synonym and fuzzy matching'
+	BEGIN
     DECLARE synonym_word VARCHAR(255) DEFAULT NULL;
     DECLARE brandId INT DEFAULT NULL;
     DECLARE categoryId INT DEFAULT NULL;
     DECLARE subCategoryId INT DEFAULT NULL;
-
     SET @boolean_keyword = CONCAT('+', REPLACE(search_keyword, ' ', ' +'));
-
-    -- Try to find synonym
+    
+	-- Try to find synonym
     SELECT synonym INTO synonym_word
     FROM search_synonyms
     WHERE LOWER(search_synonyms.keyword) = LOWER(search_keyword)
@@ -181,4 +180,4 @@ BEGIN
     ORDER BY t.relevance DESC, p.product_name ASC;
 
     DROP TEMPORARY TABLE IF EXISTS tmp_search_results;
-END
+	END
