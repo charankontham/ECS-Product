@@ -5,6 +5,8 @@ import com.ecs.ecs_product.dto.ProductFinalDto;
 import com.ecs.ecs_product.dto.SearchFilters;
 import com.ecs.ecs_product.dto.SearchResultDto;
 import com.ecs.ecs_product.entity.Product;
+import com.ecs.ecs_product.entity.TrendingSearch;
+import com.ecs.ecs_product.service.TrendingSearchService;
 import com.ecs.ecs_product.service.interfaces.IProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
 public class SearchController {
     private final IProductService productService;
+    private final TrendingSearchService trendingSearchService;
 
     @GetMapping("/{keyword}")
     public ResponseEntity<List<SearchResultDto>> getSearchSuggestions(@PathVariable("keyword") String keyword) {
@@ -64,5 +67,14 @@ public class SearchController {
         }
         Page<ProductFinalDto> results = productService.globalSearchProducts(filters, pageable);
         return ResponseEntity.ok(results);
+    }
+
+    @GetMapping("/getTrendingSearch")
+    public ResponseEntity<?> getTrendingSearch(@RequestParam(defaultValue = "10") Integer limit){
+        List<TrendingSearch> res =  trendingSearchService.getTrendingSearches(limit);
+        if(res != null && !res.isEmpty()) {
+            return ResponseEntity.ok(res);
+        }
+        return ResponseEntity.notFound().build();
     }
 }

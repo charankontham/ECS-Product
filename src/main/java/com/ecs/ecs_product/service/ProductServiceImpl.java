@@ -225,37 +225,78 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public Page<ProductFinalDto> globalSearchProducts(SearchFilters searchFilters, Pageable pageable) {
-        List<ProductWithRelevanceProjection> products = productRepository.globalSearchProducts(searchFilters.getKeyword());
-        List<ProductWithRelevanceProjection> filteredProducts = new ArrayList<>(products.stream()
-                .filter(p -> searchFilters.getCategories() == null || searchFilters.getCategories().isEmpty() || searchFilters.getCategories().contains(p.getSubCategoryId()))
-                .filter(p -> searchFilters.getSubCategories() == null || searchFilters.getSubCategories().isEmpty() || searchFilters.getSubCategories().contains(p.getSubCategoryId()))
-                .filter(p -> searchFilters.getBrands() == null || searchFilters.getBrands().isEmpty() || searchFilters.getBrands().contains(p.getProductBrandId()))
-                .filter(p -> searchFilters.getPriceRange() == null ||
-                        (p.getProductPrice() >= searchFilters.getPriceRange().get(0) && p.getProductPrice() <= searchFilters.getPriceRange().get(1)))
-                .filter(p -> searchFilters.getMinRating() == null || getProductAvgReview(p.getProductId()) >= searchFilters.getMinRating())
-                .filter(p -> searchFilters.getColors() == null || searchFilters.getColors().isEmpty() ||
-                        searchFilters.getColors().stream().anyMatch(color -> color.equalsIgnoreCase(p.getProductColor())))
-                .filter(p -> searchFilters.getCondition() == null || searchFilters.getCondition().isEmpty() ||
-                        searchFilters.getCondition().stream().anyMatch(condition -> condition.equalsIgnoreCase(p.getProductCondition())))
+        String searchQuery = searchFilters.getKeyword().trim();
+        List<Product> allProducts = new ArrayList<>();
+        List<ProductWithRelevanceProjection> products = new ArrayList<>();
+        if(searchQuery.isEmpty()){
+            allProducts = productRepository.findAll();
+            allProducts = new ArrayList<>(allProducts.stream()
+                    .filter(p -> searchFilters.getCategories() == null || searchFilters.getCategories().isEmpty() || searchFilters.getCategories().contains(p.getProductCategoryId()))
+                    .filter(p -> searchFilters.getSubCategories() == null || searchFilters.getSubCategories().isEmpty() || searchFilters.getSubCategories().contains(p.getSubCategoryId()))
+                    .filter(p -> searchFilters.getBrands() == null || searchFilters.getBrands().isEmpty() || searchFilters.getBrands().contains(p.getProductBrandId()))
+                    .filter(p -> searchFilters.getPriceRange() == null ||
+                            (p.getProductPrice() >= searchFilters.getPriceRange().get(0) && p.getProductPrice() <= searchFilters.getPriceRange().get(1)))
+                    .filter(p -> searchFilters.getMinRating() == null || getProductAvgReview(p.getProductId()) >= searchFilters.getMinRating())
+                    .filter(p -> searchFilters.getColors() == null || searchFilters.getColors().isEmpty() ||
+                            searchFilters.getColors().stream().anyMatch(color -> color.equalsIgnoreCase(p.getProductColor())))
+                    .filter(p -> searchFilters.getCondition() == null || searchFilters.getCondition().isEmpty() ||
+                            searchFilters.getCondition().stream().anyMatch(condition -> condition.equalsIgnoreCase(p.getProductCondition())))
 //                .filter(p -> minDiscount == null || p.getProduct().getDiscount() >= minDiscount)
-                .toList());
-        if ("relevance".equalsIgnoreCase(searchFilters.getSortBy())) {
-            filteredProducts.sort(Comparator.comparing(ProductWithRelevanceProjection::getRelevance).reversed());
-        } else if ("low-to-high".equalsIgnoreCase(searchFilters.getSortBy())) {
-            filteredProducts.sort(Comparator.comparing(ProductWithRelevanceProjection::getProductPrice));
-        } else if ("high-to-low".equalsIgnoreCase(searchFilters.getSortBy())) {
-            filteredProducts.sort(Comparator.comparing(ProductWithRelevanceProjection::getProductPrice, Comparator.reverseOrder()));
+                    .toList());
+        }else{
+            products = productRepository.globalSearchProducts(searchFilters.getKeyword());
+            products = new ArrayList<>(products.stream()
+                    .filter(p -> searchFilters.getCategories() == null || searchFilters.getCategories().isEmpty() || searchFilters.getCategories().contains(p.getProductCategoryId()))
+                    .filter(p -> searchFilters.getSubCategories() == null || searchFilters.getSubCategories().isEmpty() || searchFilters.getSubCategories().contains(p.getSubCategoryId()))
+                    .filter(p -> searchFilters.getBrands() == null || searchFilters.getBrands().isEmpty() || searchFilters.getBrands().contains(p.getProductBrandId()))
+                    .filter(p -> searchFilters.getPriceRange() == null ||
+                            (p.getProductPrice() >= searchFilters.getPriceRange().get(0) && p.getProductPrice() <= searchFilters.getPriceRange().get(1)))
+                    .filter(p -> searchFilters.getMinRating() == null || getProductAvgReview(p.getProductId()) >= searchFilters.getMinRating())
+                    .filter(p -> searchFilters.getColors() == null || searchFilters.getColors().isEmpty() ||
+                            searchFilters.getColors().stream().anyMatch(color -> color.equalsIgnoreCase(p.getProductColor())))
+                    .filter(p -> searchFilters.getCondition() == null || searchFilters.getCondition().isEmpty() ||
+                            searchFilters.getCondition().stream().anyMatch(condition -> condition.equalsIgnoreCase(p.getProductCondition())))
+//                .filter(p -> minDiscount == null || p.getProduct().getDiscount() >= minDiscount)
+                    .toList());
         }
+        if(searchQuery.isEmpty()) {
+            if ("low-to-high".equalsIgnoreCase(searchFilters.getSortBy())) {
+                allProducts.sort(Comparator.comparing(Product::getProductPrice));
+            } else if ("high-to-low".equalsIgnoreCase(searchFilters.getSortBy())) {
+                allProducts.sort(Comparator.comparing(Product::getProductPrice, Comparator.reverseOrder()));
+            }
 //        else if ("rating".equalsIgnoreCase(searchFilters.getSortBy())) {
 //            filteredProducts.sort(Comparator.comparing(p -> p.getRating(), Comparator.reverseOrder()));
 //        }
+        }else{
+            if ("relevance".equalsIgnoreCase(searchFilters.getSortBy())) {
+                products.sort(Comparator.comparing(ProductWithRelevanceProjection::getRelevance).reversed());
+            }else if ("low-to-high".equalsIgnoreCase(searchFilters.getSortBy())) {
+                products.sort(Comparator.comparing(ProductWithRelevanceProjection::getProductPrice));
+            } else if ("high-to-low".equalsIgnoreCase(searchFilters.getSortBy())) {
+                products.sort(Comparator.comparing(ProductWithRelevanceProjection::getProductPrice, Comparator.reverseOrder()));
+            }
+//        else if ("rating".equalsIgnoreCase(searchFilters.getSortBy())) {
+//            filteredProducts.sort(Comparator.comparing(p -> p.getRating(), Comparator.reverseOrder()));
+//        }
+        }
 
+        int listSize = searchQuery.isEmpty() ? allProducts.size() : products.size();
         int start = pageable.getPageNumber() * pageable.getPageSize();
-        int end = Math.min(start + pageable.getPageSize(), products.size());
-        List<ProductWithRelevanceProjection> paginatedProducts = start <= end ? filteredProducts.subList(start, end) : new ArrayList<>();
-        List<ProductFinalDto> pageContent = paginatedProducts.stream()
-                .map(p -> ProductMapper.mapToProductFinalDto(p, subCategoryService, productBrandService)).toList();
-        return new PageImpl<>(pageContent, PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()), products.size());
+        int end = Math.min(start + pageable.getPageSize(), listSize );
+        List<ProductFinalDto> pageContent;
+        if(searchQuery.isEmpty()){
+            allProducts = (0 <= start && start <= end && end <= listSize) ?
+                    new ArrayList<>(allProducts.subList(start, end)) : new ArrayList<>();
+            pageContent = allProducts.stream()
+                    .map(p -> ProductMapper.mapToProductFinalDto(p, subCategoryService, productBrandService)).toList();
+        }else{
+            products = (0 <= start && start <= end && end <= listSize) ?
+                    new ArrayList<>(products.subList(start, end)) : new ArrayList<>();
+            pageContent = products.stream()
+                    .map(p -> ProductMapper.mapToProductFinalDto(p, subCategoryService, productBrandService)).toList();
+        }
+        return new PageImpl<>(pageContent, PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()), listSize);
     }
 
     private Float getProductAvgReview(Integer productId) {
