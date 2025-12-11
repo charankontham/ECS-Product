@@ -4,10 +4,9 @@ package com.ecs.ecs_product.controller;
 import com.ecs.ecs_product.dto.ProductFinalDto;
 import com.ecs.ecs_product.dto.SearchFilters;
 import com.ecs.ecs_product.dto.SearchResultDto;
-import com.ecs.ecs_product.entity.Product;
 import com.ecs.ecs_product.entity.TrendingSearch;
 import com.ecs.ecs_product.service.TrendingSearchService;
-import com.ecs.ecs_product.service.interfaces.IProductService;
+import com.ecs.ecs_product.service.interfaces.ISearchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,12 +22,12 @@ import java.util.List;
 @RequestMapping("/api/search")
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
 public class SearchController {
-    private final IProductService productService;
+    private final ISearchService searchService;
     private final TrendingSearchService trendingSearchService;
 
     @GetMapping("/{keyword}")
     public ResponseEntity<List<SearchResultDto>> getSearchSuggestions(@PathVariable("keyword") String keyword) {
-        List<SearchResultDto> results = productService.getSearchSuggestions(keyword);
+        List<SearchResultDto> results = searchService.getSearchSuggestions(keyword);
         return ResponseEntity.ok(results);
     }
 
@@ -65,7 +64,7 @@ public class SearchController {
         } else {
             pageable = PageRequest.of(currentPage, pageSize);
         }
-        Page<ProductFinalDto> results = productService.globalSearchProducts(filters, pageable);
+        Page<ProductFinalDto> results = searchService.globalSearchProducts(filters, pageable);
         return ResponseEntity.ok(results);
     }
 

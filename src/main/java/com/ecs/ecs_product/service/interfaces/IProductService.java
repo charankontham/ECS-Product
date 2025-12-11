@@ -28,13 +28,9 @@ public interface IProductService {
 
     List<ProductDto> getSimilarProductsById(Integer productId);
 
-    List<SearchResultDto> getSearchSuggestions(String searchValue);
-
     Object addProduct(ProductDto productDto);
 
     Object updateProducts(List<ProductFinalDto> productFinalDtoList);
 
     HttpStatus deleteProduct(Integer productId);
-
-    Page<ProductFinalDto> globalSearchProducts(SearchFilters searchFilters, Pageable pageable);
 }
