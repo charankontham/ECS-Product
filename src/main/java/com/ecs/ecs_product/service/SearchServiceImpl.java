@@ -116,7 +116,6 @@ public class SearchServiceImpl implements ISearchService {
         int start = pageable.getPageNumber() * pageable.getPageSize();
         int end = Math.min(start + pageable.getPageSize(), listSize );
         List<ProductFinalDto> finalMappedResults;
-        Map<String, ?> pageC = new HashMap<>();
         if(searchQuery.isEmpty()){
             allProducts = (0 <= start && start <= end && end <= listSize) ?
                     new ArrayList<>(allProducts.subList(start, end)) : new ArrayList<>();
@@ -128,9 +127,7 @@ public class SearchServiceImpl implements ISearchService {
             finalMappedResults = products.stream()
                     .map(p -> ProductMapper.mapToProductFinalDto(p, subCategoryService, productBrandService)).toList();
         }
-        pageC.put("products", finalMappedResults);
-
-        return new PageImpl<>(pageC, PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()), listSize);
+        return new PageImpl<>(finalMappedResults, PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()), listSize);
     }
 
     private Float getProductAvgReview(Integer productId) {

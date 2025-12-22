@@ -2,7 +2,6 @@ package com.ecs.ecs_product.service;
 
 import com.ecs.ecs_product.dto.AdminDto;
 import com.ecs.ecs_product.dto.CustomerDto;
-import com.ecs.ecs_product.dto.UserDto;
 import com.ecs.ecs_product.dto.UserPrincipal;
 import com.ecs.ecs_product.exception.ResourceNotFoundException;
 import com.ecs.ecs_product.feign.AdminService;
